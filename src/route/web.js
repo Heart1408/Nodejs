@@ -1,11 +1,12 @@
 import express from "express";
-import homeController from '../controllers/homeController';
+import userController from "../controllers/userController";
 
 let route = express.Router();
 const initWebRoute = (app) => {
-  route.get('/', homeController.getHomepage);
+  route.post('/api/login', userController.handleLogin);
+  route.post('/api/register', userController.register);
 
- return app.use('/', route);
+  return app.use('/', route);
 }
 
 export default initWebRoute;
