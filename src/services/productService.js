@@ -1,4 +1,5 @@
 import db from '../models/index';
+const { Op } = require("sequelize");
 
 let getListProduct = () => {
   return new Promise(async (resolve, reject) => {
@@ -101,10 +102,17 @@ let filter = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let filter = []
+      console.log(data.name)
       if (data.name) {
-        let product = await db.Product.findAll ({
-          where: {name: '%.data.name'}
+        let product = await db.Product.findAll({
+          where: {
+            name: {
+              [Op.like]: '%A',
+            }
+          }
         })
+        
+
         resolve({
           data: product
         })

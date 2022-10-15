@@ -1,5 +1,4 @@
 import express from 'express';
-import configViewEngine from './config/viewEngine';
 import initAPIRoute from './route/api'
 import connection from './config/connectDB';
 
