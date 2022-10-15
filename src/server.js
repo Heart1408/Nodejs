@@ -12,16 +12,13 @@ let port = process.env.PORT || 8000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// setup view engine
-configViewEngine(app);
+app.use((req, res, next) => {
+  console.log("HTTP Method . " + req.method + " , URL . " + req.url);
+  next();
+})
 
 // init web route
 initAPIRoute(app);
-
-// handle 404 not found
-// app.use((req, res) => {
-//   return res.send('404.ejs')
-// })
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
