@@ -1,6 +1,5 @@
 import express from 'express';
-import configViewEngine from './config/viewEngine';
-import initWebRoute from './route/web'
+import initAPIRoute from './route/api'
 import connection from './config/connectDB';
 
 require('dotenv').config();
@@ -15,11 +14,13 @@ let port = process.env.PORT || 8000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// setup view engine
-configViewEngine(app);
+app.use((req, res, next) => {
+  console.log("HTTP Method . " + req.method + " , URL . " + req.url);
+  next();
+})
 
 // init web route
-initWebRoute(app);
+initAPIRoute(app);
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

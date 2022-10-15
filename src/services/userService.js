@@ -1,16 +1,18 @@
 import db from '../models/index';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+require('dotenv').config();
 
 const salt = bcrypt.genSaltSync(10);
 
 let handleLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let userData = {};
       let isExist = await checkUserEmail(email)
       if (isExist) {
         let user = await db.User.findOne({
-          attributes: ['email', 'username', 'password'],
+          attributes: ['id', 'email', 'username', 'password'],
           where: { email: email },
           raw: true
         });
@@ -18,25 +20,36 @@ let handleLogin = (email, password) => {
         if (user) {
           let check = await bcrypt.compareSync(password, user.password);
           if (check) {
-            userData.errCode = 0;
-            userData.errMessage = 'OK';
-            delete user.password;
-            userData.user = user;
+            //create JWT
+            const accessToken = jwt.sign({
+              email: user.email, id: user.id
+            }, process.env.ACCESS_TOKEN_SECRET);
+
+            resolve({
+              success: true,
+              token: accessToken,
+              user_info: user,
+            })
           } else {
-            userData.errCode = 3;
-            userData.errMessage = 'Wrong password';
+            resolve({
+              success: false,
+              errCode: 3,
+              message: 'Wrong password'
+            })
           }
         } else {
-          userData.errCode = 2;
-          userData.errMessage = 'User is not found!';
+          resolve({
+            success: false,
+            errCode: 2,
+            message: 'User is not found!'
+          })
         }
-
-        resolve(userData);
       } else {
-        userData.errCode = 1;
-        userData.errMessage = 'Email is not exist!';
-
-        resolve(userData);
+        resolve({
+          success: false,
+          errCode: 1,
+          message: 'Email is not exist!'
+        })
       }
     } catch (e) {
       reject(e);
@@ -128,4 +141,3 @@ module.exports = {
   handleLogin: handleLogin,
   register: register,
 }
-
