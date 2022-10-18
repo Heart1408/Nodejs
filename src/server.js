@@ -3,11 +3,11 @@ import initAPIRoute from './route/api'
 import connection from './config/connectDB';
 
 require('dotenv').config();
+const app = express();
 
 var cors = require('cors')
 app.use(cors())
 
-const app = express();
 let port = process.env.PORT || 8000;
 
 //body parser
