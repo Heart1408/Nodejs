@@ -24,7 +24,7 @@ module.exports = {
       amount: {
         type: Sequelize.INTEGER
       },
-      caregory_id: {
+      category_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {
