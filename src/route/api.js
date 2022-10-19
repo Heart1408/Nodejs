@@ -9,9 +9,9 @@ const initAPIRoute = (app) => {
   route.post('/api/register', userController.register);
 
   route.get('/api/getListProduct', productController.getListProduct);
-  route.get('/api/product/filter', productController.filter);
-  route.get('/api/getInfoProduct/:id', verifyToken, productController.getInfoProduct);
+  route.get('/api/getInfoProduct/:id', productController.getInfoProduct);
   route.get('/api/addProductToCart/:id', verifyToken, productController.addProductToCart);
+  route.get('/api/getRecommendedProduct/:id?', productController.getRecommendedProduct);
   return app.use('/', route);
 }
 
