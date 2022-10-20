@@ -6,8 +6,9 @@ let handleLogin = async (req, res) => {
 
   if (!email || !password) {
     return res.status(500).json({
+      success: false,
       errCode: 1,
-      message: 'Missing inputs parameter!',
+      message: 'Missing inputs parameter!'
     })
   }
 
@@ -21,6 +22,7 @@ let register = async (req, res) => {
 
   if (!username || !email || !phone || !password || !confirmPassword) {
     return res.status(500).json({
+      success: false,
       errCode: 1,
       message: 'Missing inputs parameter!',
     })
@@ -28,6 +30,7 @@ let register = async (req, res) => {
   let userData = await userService.register(req.body);
 
   return res.status(200).json({
+    success: userData.success,
     errCode: userData.errCode,
     message: userData.errMessage,
     user: userData.user

@@ -25,10 +25,16 @@ let handleLogin = (email, password) => {
               email: user.email, id: user.id
             }, process.env.ACCESS_TOKEN_SECRET);
 
+            let data_user =  {
+              id: user.id,
+              email: user.email,
+              username: user.username
+            }
+
             resolve({
               success: true,
               token: accessToken,
-              user_info: user,
+              user_info: data_user
             })
           } else {
             resolve({
@@ -65,11 +71,13 @@ let register = (data) => {
       let isPhoneExist = await checkExistPhone(data.phone)
 
       if (data.password != data.confirmPassword) {
+        userData.success = false;
         userData.errCode = 1;
         userData.errMessage = 'Password not confirm!';
 
         resolve(userData);
       } else if (isEmailExist || isPhoneExist) {
+        userData.success = false;
         userData.errCode = 1;
         userData.errMessage = 'Email or phone number already exists!';
 
@@ -83,7 +91,7 @@ let register = (data) => {
             phone: data.phone,
             password: hashPasswordFromBcrypt,
           })
-          userData.errCode = 0;
+          userData.success = true;
           userData.errMessage = 'Register Succeed!';
           let user = {
             username: data.username,
