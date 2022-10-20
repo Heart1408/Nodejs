@@ -104,19 +104,44 @@ let getProductSizeId = async(productId, sizeId) => {
 let getAmountSoldProducts = () => {
     return new Promise(async (resolve, reject) => {
         try {
-
             let productList = await db.Product.findAll({
-                attributes: ['id', 'name', 'description', 'image', 'amount', 'price', [db.sequelize.fn('sum', db.sequelize.col('OrderDetails.amount')), 'int', 'total_sold']],
+                attributes: ['id', 'name', 'description', 'image', 'price', [db.sequelize.fn('sum', db.sequelize.col('SizeShoes->OrderDetails.amount')), 'total_sold']],
                 include: [
                     {
-                        model: db.OrderDetail,
-                        required: true,
-                        attributes: []
+                        model: db.SizeShoe,
+                        required: false,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.OrderDetail,
+                                required: true,
+                                attributes: []
+                            }
+                        ]
                     }
                 ],
                 group: ['Product.id'],
                 raw: true
             })
+
+            for (let i=0; i<productList.length; i++)
+            {
+                let amount = await db.SizeShoe.sum('amount', {
+                    where: {
+                        product_id: productList[i].id
+                    }
+                })
+                productList[i].amount = amount
+            }
+
+            // productList.forEach(async(element) => {
+            //     let amount = await db.SizeShoe.sum('amount', {
+            //         where: {
+            //             product_id: element.id
+            //         }
+            //     })
+            //     element.amount = amount
+            // });
 
             // productList.forEach(element => {
             //     element.total_sold = parseInt(element.total_sold)
