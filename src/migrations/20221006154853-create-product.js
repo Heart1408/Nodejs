@@ -21,9 +21,6 @@ module.exports = {
       price: {
         type: Sequelize.INTEGER
       },
-      amount: {
-        type: Sequelize.INTEGER
-      },
       caregory_id: {
         type: Sequelize.INTEGER
       },

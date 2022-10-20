@@ -2,14 +2,35 @@ import { ModulesOption } from '@babel/preset-env/lib/options';
 import db, { sequelize } from '../models/index'
 
 let getDetailOrder = (orderId) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             let listProduct = await db.OrderDetail.findAll({
+                attributes: ['id', 'amount', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
+                include: [
+                    {
+                        model: db.SizeShoe,
+                        required: true,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.Product,
+                                required: true,
+                                attributes: []
+                            },
+                            {
+                                model: db.Size,
+                                required: true,
+                                attributes: []
+                            }
+
+                        ]
+                    }
+                ],
                 where: {
                     order_id: orderId
                 },
                 raw: true
-            });
+            })
 
             if (listProduct) {
                 resolve({
@@ -22,14 +43,14 @@ let getDetailOrder = (orderId) => {
                     success: false
                 })
             }
-        } catch(e) {
+        } catch (e) {
             reject(e)
         }
     })
 }
 
 let createOrder = (data, userId) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         let address = data.address;
         let phone = data.phone;
         let receive_name = data.receiveName;
@@ -44,11 +65,11 @@ let createOrder = (data, userId) => {
                 receive_name: receive_name,
                 ordertime: new Date()
             })
-            
+
             for (let i = 0; i < products.length; i++) {
                 await db.OrderDetail.create({
                     order_id: order.id,
-                    product_id: products[i].id,
+                    product_size_id: await getProductSizeId(products[i].id, products[i].size),
                     amount: products[i].amount
                 })
             }
@@ -63,18 +84,29 @@ let createOrder = (data, userId) => {
                     success: false
                 })
             }
-        } catch(e) {
+        } catch (e) {
             reject(e);
         }
     })
 }
 
+let getProductSizeId = async(productId, sizeId) => {
+    let id = await db.SizeShoe.findOne({
+        where: {
+            product_id: productId,
+            size_id: sizeId
+        },
+        raw: true
+    })
+    return id.id
+}
+
 let getAmountSoldProducts = () => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            
+
             let productList = await db.Product.findAll({
-                attributes: ['id', 'name', 'description', 'image', 'amount', 'price', [db.sequelize.fn('sum', db.sequelize.col('OrderDetails.amount')), 'total_sold']],
+                attributes: ['id', 'name', 'description', 'image', 'amount', 'price', [db.sequelize.fn('sum', db.sequelize.col('OrderDetails.amount')), 'int', 'total_sold']],
                 include: [
                     {
                         model: db.OrderDetail,
@@ -86,10 +118,10 @@ let getAmountSoldProducts = () => {
                 raw: true
             })
 
-            productList.forEach(element => {
-                element.total_sold = parseInt(element.total_sold)
-            });
-            
+            // productList.forEach(element => {
+            //     element.total_sold = parseInt(element.total_sold)
+            // });
+
 
             /** 
             let productList = await sequelize.query("select product_id, P.name, sum(OrderDetails.amount) as sum from OrderDetails join Products P on P.id = OrderDetails.product_id GROUP BY product_id",
@@ -109,7 +141,7 @@ let getAmountSoldProducts = () => {
                 console.log(productList[i].totalSold);
             }
             */
-            
+
             if (productList) {
                 console.log(productList);
                 resolve({
@@ -125,7 +157,7 @@ let getAmountSoldProducts = () => {
         } catch (e) {
             reject(e)
         }
-    }) 
+    })
 }
 
 module.exports = {
