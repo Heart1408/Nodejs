@@ -1,11 +1,23 @@
+import category from '../models/category';
 import db from '../models/index';
 const { Op } = require("sequelize");
+var sequelize = require('sequelize');
 
-let getListProduct = () => {
+let getListProduct = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let listProduct = await db.Product.findAll({
-        attributes: ['name', 'image', 'price'],
+        where: {
+          [Op.and]: [
+            data.name ? {
+              name: {
+                [Op.like]: '%' + data.name + '%',
+              }
+            } : null,
+            data.category ? { category_id: data.category } : null,
+          ]
+        },
+        order: data.price ? [['price', data.price]] : null,
         raw: true,
       });
 
@@ -98,25 +110,44 @@ let addProductToCart = (productId, userId) => {
   })
 }
 
-let filter = (data) => {
+// theo so luong san pham ban ra
+let getRecommendedProduct = (categoryId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let filter = []
-      console.log(data.name)
-      if (data.name) {
-        let product = await db.Product.findAll({
-          where: {
-            name: {
-              [Op.like]: '%A',
-            }
-          }
-        })
-        
+      // let data = await db.Category.findOne({
+      //   where: {
+      //     id: categoryId
+      //   },
+      //   attributes:  ['id', 'name'],
+      //   include: [
+      //     { model: db.Product, as: 'categoryData' }
+      //   ]
+      // })
 
-        resolve({
-          data: product
-        })
-      }
+      let data = await db.Product.findAll({
+        attributes: [
+          'id',
+          'name',
+          'description',
+          'image',
+          'price',
+          [sequelize.fn('SUM', sequelize.col('OrderDetails.amount')), 'total_sold']
+        ],
+        include: [{
+          model: db.OrderDetail,
+          // require: true,
+          attributes: []
+        }],
+        where: categoryId ? { category_id: categoryId } : null,
+        group: ['Product.id'],
+        order: [['total_sold', 'DESC']],
+        raw: true,
+      })
+
+      resolve({
+        success: true,
+        data: data
+      })
     } catch (e) {
       reject(e)
     }
@@ -127,5 +158,5 @@ module.exports = {
   getListProduct: getListProduct,
   getInfoProduct: getInfoProduct,
   addProductToCart: addProductToCart,
-  filter: filter,
+  getRecommendedProduct: getRecommendedProduct,
 }

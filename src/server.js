@@ -5,10 +5,10 @@ import connection from './config/connectDB';
 require('dotenv').config();
 const app = express();
 
+let port = process.env.PORT || 8000;
+
 var cors = require('cors')
 app.use(cors())
-
-let port = process.env.PORT || 8000;
 
 //body parser
 app.use(express.urlencoded({ extended: true }));

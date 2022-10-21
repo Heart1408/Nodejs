@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const orderdetail = require('./orderdetail');
 module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
     /**
@@ -12,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Product.hasMany(models.SizeShoe, {foreignKey: 'product_id'})
+      Product.belongsTo(models.Category, { foreignKey: 'category_id' })
     }
   }
   Product.init({
