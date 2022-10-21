@@ -21,6 +21,8 @@ const initAPIRoute = (app) => {
   route.get('/api/detailOrder/:id', orderDetailController.getDetailOrder);
   route.get('/api/orderHistory', verifyToken, orderController.orderHistory);
   route.post('/api/createOrder', verifyToken, orderDetailController.createOrder); 
+  route.get('/api/amountSoldProduct', orderDetailController.getAmountSoldProducts);
+
   return app.use('/', route);
 }
 
