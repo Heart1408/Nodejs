@@ -7,6 +7,9 @@ let getListProduct = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let listProduct = await db.Product.findAll({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
         where: {
           [Op.and]: [
             data.name ? {
@@ -55,7 +58,7 @@ let getInfoProduct = (productId) => {
         resolve({
           success: false,
           message: 'abc',
-          product_info: [],
+          // product_info: [],
         })
       }
     } catch (e) {
@@ -67,6 +70,17 @@ let getInfoProduct = (productId) => {
 let addProductToCart = (productId, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let product = await db.Product.findOne({
+        where: {id: productId}
+      })
+
+      if (!product) {
+        resolve({
+          success: false,
+          message: 'Sản phẩm không tồn tại!',
+        })
+      }
+
       let cart = await db.Cart.findOne({
         where: { product_id: productId, user_id: userId }
       });
