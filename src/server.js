@@ -5,6 +5,9 @@ import connection from './config/connectDB';
 require('dotenv').config();
 const app = express();
 
+var cookies = require("cookie-parser");
+app.use(cookies());
+
 let port = process.env.PORT || 8000;
 
 var cors = require('cors')

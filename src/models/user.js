@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     avatar: DataTypes.STRING,
     birthday: DataTypes.DATE,
     gender: DataTypes.DATE,
+    refresh_token: DataTypes.TEXT,
   }, {
     sequelize,
     modelName: 'User',
