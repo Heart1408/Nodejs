@@ -23,6 +23,7 @@ const initAPIRoute = (app) => {
   route.get('/order/detailOrder/:id', orderDetailController.getDetailOrder);
   route.get('/order/orderHistory', verifyToken, orderController.orderHistory);
   route.post('/order/createOrder', verifyToken, orderDetailController.createOrder);
+  route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
   return app.use('/api', route);
 }

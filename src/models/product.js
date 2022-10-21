@@ -11,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      // define association here
+      Product.hasMany(models.SizeShoe, {foreignKey: 'product_id'})
       Product.belongsTo(models.Category, { foreignKey: 'category_id' })
-      // Product.belongsToMany(models.Order, { through: models.OrderDetail, foreignKey: 'product_id', otherKey: 'order_id' })
-      Product.hasMany(models.OrderDetail, {foreignKey: 'product_id'})
     }
   }
   Product.init({
@@ -21,8 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     image: DataTypes.STRING,
     price: DataTypes.INTEGER,
-    amount: DataTypes.INTEGER,
-    category_id: DataTypes.INTEGER
+    caregory_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Product',

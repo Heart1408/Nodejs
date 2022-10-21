@@ -15,7 +15,14 @@ let createOrder = async(req, res) => {
     return res.status(200).json(success);
 }
 
+let getAmountSoldProducts = async(req, res) => {
+    let listProduct = await orderDetailService.getAmountSoldProducts();
+
+    return res.status(200).json(listProduct);
+}
+
 module.exports = {
     getDetailOrder: getDetailOrder,
-    createOrder: createOrder
+    createOrder: createOrder,
+    getAmountSoldProducts: getAmountSoldProducts
 }
