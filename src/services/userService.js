@@ -22,7 +22,7 @@ let handleLogin = (email, password) => {
           if (check) {
             //create JWT
             const accessToken = jwt.sign({
-              email: user.email, id: user.id
+              email: user.email, id: user.id, role: "user"
             }, process.env.ACCESS_TOKEN_SECRET);
 
             let data_user =  {

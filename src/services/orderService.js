@@ -49,6 +49,14 @@ let changeStatusOrder = (orderId, status) => {
 let deleteOrder = (orderId) => {
     return new Promise(async(resolve, reject) => {
         try {
+            let isExist = await getOrder(orderId)
+            if (!isExist.success) {
+                resolve({
+                    success: false,
+                    errCode: 1,
+                    message: 'Order is not exist!'
+                })
+            }
             await db.Order.destroy({
                 where: {
                     id: orderId
@@ -90,9 +98,36 @@ let orderHistory = (userId) => {
     })
 }
 
+let getOrder = (orderId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let order = await db.Order.findOne({
+                where : {
+                    id: orderId
+                },
+                raw: true
+            })
+            if (order) {
+                resolve({
+                    success: true,
+                    order: order
+                })
+            }
+            else {
+                resolve({
+                    success: false
+                })
+            }
+        } catch(e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getAllOrder: getAllOrder,
     changeStatusOrder: changeStatusOrder,
     deleteOrder: deleteOrder,
-    orderHistory: orderHistory
+    orderHistory: orderHistory,
+    getOrder: getOrder
 }
