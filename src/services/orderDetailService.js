@@ -66,13 +66,18 @@ let createOrder = (data, userId) => {
                 ordertime: new Date()
             })
 
+            let detailData = []
+
             for (let i = 0; i < products.length; i++) {
-                await db.OrderDetail.create({
+                let record = {
                     order_id: order.id,
                     product_size_id: await getProductSizeId(products[i].id, products[i].size),
                     amount: products[i].amount
-                })
+                }
+                detailData.push(record);                
             }
+            
+            db.OrderDetail.bulkCreate(detailData)
 
             if (order) {
                 resolve({
