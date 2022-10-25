@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Product.hasMany(models.SizeShoe, {foreignKey: 'product_id'})
+      Product.hasMany(models.SizeShoe, { foreignKey: 'product_id' })
       Product.belongsTo(models.Category, { foreignKey: 'category_id' })
     }
   }
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     image: DataTypes.STRING,
     price: DataTypes.INTEGER,
-    caregory_id: DataTypes.INTEGER
+    category_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Product',

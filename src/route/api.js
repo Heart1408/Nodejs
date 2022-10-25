@@ -11,6 +11,8 @@ let route = express.Router();
 const initAPIRoute = (app) => {
   route.post('/login', userController.handleLogin);
   route.post('/register', userController.register);
+  route.post('/token', userController.token);
+  route.post('/logout', userController.logout);
 
   route.get('/product/getListProduct', productController.getListProduct);
   route.get('/product/getInfoProduct/:id', productController.getInfoProduct);
@@ -23,7 +25,6 @@ const initAPIRoute = (app) => {
   route.get('/order/detailOrder/:id', orderDetailController.getDetailOrder);
   route.get('/order/orderHistory', verifyToken, orderController.orderHistory);
   route.post('/order/createOrder', verifyToken, orderDetailController.createOrder);
-  route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
   return app.use('/api', route);
 }
