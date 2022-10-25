@@ -46,8 +46,26 @@ let getInfoProduct = (productId) => {
     try {
       let productInfo = await db.Product.findOne({
         where: { id: productId },
-        raw: true
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        raw: true,
       })
+
+      let size = await db.Size.findAll({
+        attributes: [
+          'size',
+          [sequelize.fn('SUM', sequelize.col('sizeshoes.amount')), 'amount']
+        ],
+        include: [{
+          model: db.SizeShoe,
+          attributes: [],
+          where: { product_id: productInfo.id },
+        }],
+        group: ['Size.id'],
+        raw: true,
+      })
+      productInfo.size_info = size;
 
       if (productInfo) {
         resolve({
@@ -67,14 +85,14 @@ let getInfoProduct = (productId) => {
   })
 }
 
-let addProductToCart = (productId, userId) => {
+let addProductToCart = (productId, sizeId, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let product = await db.Product.findOne({
-        where: {id: productId}
+      let sizeshoe = await db.SizeShoe.findOne({
+        where: { product_id: productId, size_id: sizeId }
       })
 
-      if (!product) {
+      if (!sizeshoe) {
         resolve({
           success: false,
           message: 'Sản phẩm không tồn tại!',
@@ -82,22 +100,28 @@ let addProductToCart = (productId, userId) => {
       }
 
       let cart = await db.Cart.findOne({
-        where: { product_id: productId, user_id: userId }
+        where: { sizeshoe_id: sizeshoe.id, user_id: userId }
       });
 
-      let remainingStock = await db.Product.findOne({
-        attributes: ['amount'],
-        where: { id: productId }
-      })
-
       if (cart) {
-        if (cart.amount < remainingStock.amount) {
+        if (cart.amount < sizeshoe.amount) {
           cart.amount += 1;
           await cart.save();
 
+          let productInfo = await db.Product.findOne({
+            attributes: {
+              exclude: ['createdAt', 'updatedAt']
+            },
+            where: { id: productId },
+            raw: true,
+          })
+          let size = await db.Size.findOne({ attributes: ['size'], where: { id: sizeId } })
+          productInfo.size = size.size
+          productInfo.amount = cart.amount
+
           resolve({
             success: true,
-            product_id: productId,
+            product_info: productInfo,
           })
         } else {
           resolve({
@@ -106,16 +130,27 @@ let addProductToCart = (productId, userId) => {
           })
         }
       } else {
-        await db.Cart.create({
+        let cart = await db.Cart.create({
           user_id: userId,
-          product_id: productId,
+          sizeshoe_id: sizeshoe.id,
           amount: 1,
           status: 1,
         })
 
+        let product = await db.Product.findOne({
+          attributes: {
+            exclude: ['createdAt', 'updatedAt']
+          },
+          where: { id: productId },
+          raw: true,
+        });
+        let size = await db.Size.findOne({ where: { id: sizeId }, attributes: ['size'] });
+        product.size = size;
+        product.amount = cart.amount;
+
         resolve({
           success: true,
-          product_id: productId,
+          product_info: product,
         })
       }
     } catch (e) {
@@ -128,36 +163,26 @@ let addProductToCart = (productId, userId) => {
 let getRecommendedProduct = (categoryId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // let data = await db.Category.findOne({
-      //   where: {
-      //     id: categoryId
-      //   },
-      //   attributes:  ['id', 'name'],
-      //   include: [
-      //     { model: db.Product, as: 'categoryData' }
-      //   ]
-      // })
-
       let data = await db.Product.findAll({
-        attributes: [
-          'id',
-          'name',
-          'description',
-          'image',
-          'price',
-          [sequelize.fn('SUM', sequelize.col('OrderDetails.amount')), 'total_sold']
-        ],
-        include: [{
-          model: db.OrderDetail,
-          // require: true,
-          attributes: []
-        }],
-        where: categoryId ? { category_id: categoryId } : null,
-        group: ['Product.id'],
-        order: [['total_sold', 'DESC']],
-        raw: true,
-      })
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        include: {
+          model: db.SizeShoe,
+          include: [{
+            model: db.OrderDetail,
+            // require: true,
+            attributes: []
+          }],
 
+          attributes: [
+            [sequelize.fn('SUM', sequelize.col('SizeShoes.OrderDetails.amount')), 'total_sold']
+          ]
+        },
+        group: ['SizeShoes.product_id'],
+        order: [[sequelize.literal('`SizeShoes.total_sold`'), 'DESC']],
+        where: categoryId ? { category_id: categoryId } : null,
+      })
       resolve({
         success: true,
         data: data

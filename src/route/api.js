@@ -14,7 +14,7 @@ const initAPIRoute = (app) => {
 
   route.get('/product/getListProduct', productController.getListProduct);
   route.get('/product/getInfoProduct/:id', productController.getInfoProduct);
-  route.get('/product/addProductToCart/:id', verifyToken, productController.addProductToCart);
+  route.get('/product/addProductToCart/:productId/:sizeId', verifyToken, productController.addProductToCart);
   route.get('/product/getRecommendedProduct/:id?', productController.getRecommendedProduct);
 
   route.get('/order/getAllOrder', orderController.getAllOrder);

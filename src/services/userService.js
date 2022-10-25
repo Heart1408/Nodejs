@@ -25,11 +25,9 @@ let handleLogin = (email, password) => {
               email: user.email, id: user.id
             }, process.env.ACCESS_TOKEN_SECRET);
 
-            let data_user =  {
-              id: user.id,
-              email: user.email,
-              username: user.username
-            }
+            let data_user = await db.User.findOne({
+              where: { id: user.id }
+            })
 
             resolve({
               success: true,
@@ -85,19 +83,16 @@ let register = (data) => {
       } else {
         try {
           let hashPasswordFromBcrypt = await bcrypt.hashSync(data.password, salt);
-          await db.User.create({
-            uername: data.username,
+          let createUser = await db.User.create({
+            username: data.username,
             email: data.email,
             phone: data.phone,
             password: hashPasswordFromBcrypt,
           })
           userData.success = true;
           userData.errMessage = 'Register Succeed!';
-          let user = {
-            username: data.username,
-            email: data.email,
-            phone: data.phone,
-          }
+
+          let user = await db.User.findOne({ where: { id: createUser.id } });
           userData.user = user;
 
           resolve(userData);

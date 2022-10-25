@@ -14,9 +14,10 @@ let getInfoProduct = async (req, res) => {
 }
 
 let addProductToCart = async (req, res) => {
-  let productId = req.params.id;
+  let productId = req.params.productId;
+  let sizeId = req.params.sizeId;
   let userId = req.userId;
-  let result = await productService.addProductToCart(productId, userId);
+  let result = await productService.addProductToCart(productId, sizeId, userId);
 
   return res.status(200).json(result);
 }
