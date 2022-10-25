@@ -10,6 +10,10 @@ const expressListRoutes = require('express-list-routes');
 let route = express.Router();
 
 const initAPIRoute = (app) => {
+
+  route.post('/token', userController.token);
+  route.post('/logout', userController.logout);
+
   route.get('/product/getListProduct', productController.getListProduct);
   route.get('/product/getInfoProduct/:id', productController.getInfoProduct);
   route.get('/product/addProductToCart/:id', productController.addProductToCart);

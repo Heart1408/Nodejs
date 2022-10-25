@@ -25,16 +25,16 @@ let handleLogin = (email, password) => {
               email: user.email, id: user.id, role: "user"
             }, process.env.ACCESS_TOKEN_SECRET);
 
-            let data_user =  {
-              id: user.id,
-              email: user.email,
-              username: user.username
-            }
+            const tokens = generateTokens(user)
+            await db.User.update({ refresh_token: tokens.refreshToken }, {
+              where: { id: user.id }
+            });
+            delete user.password;
 
             resolve({
               success: true,
-              token: accessToken,
-              user_info: data_user
+              token: tokens,
+              user_info: user
             })
           } else {
             resolve({
@@ -59,6 +59,51 @@ let handleLogin = (email, password) => {
       }
     } catch (e) {
       reject(e);
+    }
+  })
+}
+
+const generateTokens = payload => {
+  const { id, email } = payload
+  const accessToken = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '15s'
+  });
+  const refreshToken = jwt.sign({ id, email }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '1d'
+  });
+
+  return { accessToken, refreshToken };
+}
+
+let token = (refreshToken) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findAll({
+        where: { refresh_token: refreshToken }
+      })
+
+      if (!user[0]) {
+        resolve({
+          success: false,
+          message: 'nmn'
+        })
+      }
+
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        if (err) return res.sendStatus(403);
+        const id = user[0].id;
+        const email = user[0].email;
+        const accessToken = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: '15s'
+        });
+
+        resolve({
+          success: true,
+          token: accessToken
+        })
+      });
+    } catch (e) {
+      reject(e)
     }
   })
 }
@@ -145,7 +190,31 @@ let checkExistPhone = (phone) => {
   })
 }
 
+let logout = (refreshToken) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await db.User.findAll({
+        where: { refresh_token: refreshToken }
+      });
+      if (!user[0]) return res.sendStatus(204);
+      const userId = user[0].id;
+      await db.User.update({ refresh_token: null }, {
+        where: { id: userId }
+      });
+
+      resolve({
+        success: true,
+        message: 'logout success!'
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = {
   handleLogin: handleLogin,
   register: register,
+  token: token,
+  logout: logout,
 }
