@@ -55,6 +55,14 @@ let deleteOrder = async (req, res) => {
 
 let orderHistory = async(req, res) => {
     let userId = req.userId
+    let status = req.params.status
+    if (!status) {
+        return res.status(500).json({
+            success: false,
+            errCode: 1,
+            message: 'Missing inputs parameter!'
+        })
+    }
     let listOrder = await orderService.orderHistory(userId)
 
     return res.status(200).json(listOrder);

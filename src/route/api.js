@@ -15,13 +15,13 @@ const initAPIRoute = (app) => {
   route.get('/product/addProductToCart/:id', productController.addProductToCart);
   route.get('/product/getRecommendedProduct/:id?', productController.getRecommendedProduct);
 
-  route.get('/order/getAllOrder',verifyRoles('admin'), orderController.getAllOrder);
-  route.post('/order/changeStatusOrder',verifyRoles('admin', 'user'), orderController.changeStatusOrder);
-  route.post('/order/deleteOrder',verifyRoles('admin'), orderController.deleteOrder);
-  route.get('/order/detailOrder/:id',verifyRoles('admin', 'user'), orderDetailController.getDetailOrder);
-  route.get('/order/orderHistory',verifyRoles('user'), orderController.orderHistory);
-  route.post('/order/createOrder',verifyRoles('user'), orderDetailController.createOrder);
-  route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
+  route.get('/order/all',verifyRoles('admin'), orderController.getAllOrder);
+  route.post('/order/changeStatus',verifyRoles('admin', 'user'), orderController.changeStatusOrder);
+  route.post('/order/delete',verifyRoles('admin'), orderController.deleteOrder);
+  route.get('/order/detail/:id',verifyRoles('admin', 'user'), orderDetailController.getDetailOrder);
+  route.get('/order/history/:status',verifyRoles('user'), orderController.orderHistory);
+  route.post('/order/create',verifyRoles('user'), orderDetailController.createOrder);
+  //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
   return app.use('/api', route);
 }

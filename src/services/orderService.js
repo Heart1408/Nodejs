@@ -71,12 +71,13 @@ let deleteOrder = (orderId) => {
     })
 }
 
-let orderHistory = (userId) => {
+let orderHistory = (userId, status) => {
     return new Promise(async(resolve, reject) => {
         try {
             let listOrder = await db.Order.findAll({
                 where: {
-                    user_id: userId
+                    user_id: userId,
+                    status: status
                 },
                 raw: true
             })
