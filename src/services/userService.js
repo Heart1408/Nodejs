@@ -20,10 +20,6 @@ let handleLogin = (email, password) => {
         if (user) {
           let check = await bcrypt.compareSync(password, user.password);
           if (check) {
-            //create JWT
-            const accessToken = jwt.sign({
-              email: user.email, id: user.id, role: "user"
-            }, process.env.ACCESS_TOKEN_SECRET);
 
             const tokens = generateTokens(user)
             await db.User.update({ refresh_token: tokens.refreshToken }, {
@@ -65,10 +61,10 @@ let handleLogin = (email, password) => {
 
 const generateTokens = payload => {
   const { id, email } = payload
-  const accessToken = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '15s'
+  const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '150s'
   });
-  const refreshToken = jwt.sign({ id, email }, process.env.REFRESH_TOKEN_SECRET, {
+  const refreshToken = jwt.sign({ id, email, role: "user" }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: '1d'
   });
 
@@ -93,8 +89,8 @@ let token = (refreshToken) => {
         if (err) return res.sendStatus(403);
         const id = user[0].id;
         const email = user[0].email;
-        const accessToken = jwt.sign({ id, email }, process.env.ACCESS_TOKEN_SECRET, {
-          expiresIn: '15s'
+        const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: '150s'
         });
 
         resolve({
@@ -131,7 +127,7 @@ let register = (data) => {
         try {
           let hashPasswordFromBcrypt = await bcrypt.hashSync(data.password, salt);
           await db.User.create({
-            uername: data.username,
+            username: data.username,
             email: data.email,
             phone: data.phone,
             password: hashPasswordFromBcrypt,

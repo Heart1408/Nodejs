@@ -12,6 +12,11 @@ let handleLogin = async (req, res) => {
     })
   }
   let result = await userService.handleLogin(email, password);
+
+  if (!result.success) {
+    return res.status(500).json(result)
+  }
+  
   res.cookie('refreshToken', result.token.refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 100

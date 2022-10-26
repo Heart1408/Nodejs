@@ -36,7 +36,7 @@ let getDetailOrder = async(req, res) => {
 let createOrder = async(req, res) => {
     let data = req.body;
     let userId = req.userId;
-    if (!data || !data.address ||!data.phone || !data.receive_name ||!data.products) {
+    if (!data || !data.address ||!data.phone || !data.receiveName ||!data.products) {
         return res.status(500).json({
             success: false,
             errCode: 1,

@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       SizeShoe.belongsTo(models.Product, {foreignKey: 'product_id'});
       SizeShoe.hasMany(models.OrderDetail, {foreignKey: 'product_size_id'});
       SizeShoe.belongsTo(models.Size, {foreignKey: 'size_id'});
+      SizeShoe.hasMany(models.Cart, {foreignKey: 'product_size_id'})
     }
   }
   SizeShoe.init({
