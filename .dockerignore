@@ -1,0 +1,6 @@
+.github
+.dockerignore
+.git
+Dockerfile
+README.md
+.secrets
