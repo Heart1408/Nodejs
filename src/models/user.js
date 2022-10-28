@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasMany(models.Order, {foreignKey: 'user_id'})
+      User.hasMany(models.Cart, {foreignKey: 'user_id'})
     }
   }
   User.init({
@@ -24,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     avatar: DataTypes.STRING,
     birthday: DataTypes.DATE,
     gender: DataTypes.DATE,
+    refresh_token: DataTypes.TEXT,
   }, {
     sequelize,
     modelName: 'User',

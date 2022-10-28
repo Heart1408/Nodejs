@@ -1,9 +1,14 @@
 import express from 'express';
 import initAPIRoute from './route/api'
 import connection from './config/connectDB';
+import verify from './middleware/auth';
+const verifyJWT = require('./middleware/auth');
 
 require('dotenv').config();
 const app = express();
+
+var cookies = require("cookie-parser");
+app.use(cookies());
 
 let port = process.env.PORT || 8000;
 
@@ -18,8 +23,9 @@ app.use((req, res, next) => {
   console.log("HTTP Method . " + req.method + " , URL . " + req.url);
   next();
 })
-
 // init web route
+app.use('/', require('./route/root'));
+app.use(verifyJWT);
 initAPIRoute(app);
 
 app.listen(port, () => {
