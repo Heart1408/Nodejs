@@ -15,13 +15,15 @@ module.exports = (sequelize, DataTypes) => {
       Product.hasMany(models.SizeShoe, {foreignKey: 'product_id'})
       //Product.belongsTo(models.Category, { foreignKey: 'category_id' })
       Product.hasMany(models.Product_Category, {foreignKey: 'product_id'})
+
     }
   }
   Product.init({
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
     image: DataTypes.STRING,
-    price: DataTypes.INTEGER
+    price: DataTypes.INTEGER,
+    category_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Product',

@@ -20,7 +20,6 @@ let handleLogin = (email, password) => {
         if (user) {
           let check = await bcrypt.compareSync(password, user.password);
           if (check) {
-
             const tokens = generateTokens(user)
             await db.User.update({ refresh_token: tokens.refreshToken }, {
               where: { id: user.id }
@@ -126,7 +125,7 @@ let register = (data) => {
       } else {
         try {
           let hashPasswordFromBcrypt = await bcrypt.hashSync(data.password, salt);
-          await db.User.create({
+          let createUser = await db.User.create({
             username: data.username,
             email: data.email,
             phone: data.phone,
@@ -134,11 +133,8 @@ let register = (data) => {
           })
           userData.success = true;
           userData.errMessage = 'Register Succeed!';
-          let user = {
-            username: data.username,
-            email: data.email,
-            phone: data.phone,
-          }
+
+          let user = await db.User.findOne({ where: { id: createUser.id } });
           userData.user = user;
 
           resolve(userData);

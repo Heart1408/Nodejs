@@ -12,7 +12,7 @@ module.exports = {
       user_id: {
         type: Sequelize.INTEGER
       },
-      product_size_id: {
+      sizeshoe_id: {
         type: Sequelize.INTEGER
       },
       amount: {
