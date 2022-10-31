@@ -109,17 +109,17 @@ mysql:
         memory: 128Mi
     startupProbe:
       enabled: false
-healthcheck:
-  livenessProbe:
-    httpGet:
-      path: /
-      port: http
-    periodSeconds: 5
-    initialDelaySeconds: 30
-  readinessProbe:
-    httpGet:
-      path: /
-      port: http
-    periodSeconds: 5
-    initialDelaySeconds: 30
+healthcheck: {}
+  # livenessProbe:
+  #   httpGet:
+  #     path: /
+  #     port: http
+  #   periodSeconds: 5
+  #   initialDelaySeconds: 30
+  # readinessProbe:
+  #   httpGet:
+  #     path: /
+  #     port: http
+  #   periodSeconds: 5
+  #   initialDelaySeconds: 30
     
