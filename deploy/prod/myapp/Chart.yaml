@@ -29,3 +29,7 @@ dependencies:
     condition: mysql.enabled
     repository: https://charts.bitnami.com/bitnami
     version: 9.3.4
+  - name: sish-client
+    condition: sish-client.enabled
+    repository: https://aqaurius6666.github.io/helm-charts
+    version: 0.6.0
