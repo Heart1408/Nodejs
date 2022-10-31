@@ -14,7 +14,9 @@ let port = process.env.PORT || 8000;
 
 var cors = require('cors')
 app.use(cors())
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
+})
 //body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
