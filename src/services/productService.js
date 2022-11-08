@@ -3,12 +3,27 @@ import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
+const getPagination = (pageNumber) => {
+  const limit = 10;
+  const offset = pageNumber ? pageNumber * limit : 0;
+
+  return { limit, offset };
+}
+
 let getListProduct = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const { limit, offset } = data.pageNumber ? getPagination(data.pageNumber) : [null, null];
+
       let listProduct = await db.Product.findAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt']
+        },
+        include: {
+          model: db.Product_Category,
+          attributes: [],
+          where: data.categoryId ? { 'category_id': data.categoryId } : null,
+          limit: 1,
         },
         where: {
           [Op.and]: [
@@ -18,9 +33,13 @@ let getListProduct = (data) => {
               }
             } : null,
             data.category ? { category_id: data.category } : null,
+            data.minPrice ? { price: { [Op.gte]: data.minPrice } } : null,
+            data.maxPrice ? { price: { [Op.lte]: data.maxPrice } } : null,
           ]
         },
-        order: data.sort ? [['price', data.sort]] : null,
+        order: data.sortByPrice ? [['price', data.sortByPrice]] : null,
+        limit,
+        offset,
         raw: true,
       });
 
