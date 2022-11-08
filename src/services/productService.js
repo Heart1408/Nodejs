@@ -167,7 +167,7 @@ let getRecommendedProduct = (categoryId) => {
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
-        include: {
+        include: [{
           model: db.SizeShoe,
           include: [{
             model: db.OrderDetail,
@@ -179,9 +179,14 @@ let getRecommendedProduct = (categoryId) => {
             [sequelize.fn('SUM', sequelize.col('SizeShoes.OrderDetails.amount')), 'total_sold']
           ]
         },
+        {
+          model: db.Product_Category,
+          attributes: [],
+          where: categoryId ? { 'category_id': categoryId } : null,
+        }
+        ],
         group: ['SizeShoes.product_id'],
         order: [[sequelize.literal('`SizeShoes.total_sold`'), 'DESC']],
-        where: categoryId ? { category_id: categoryId } : null,
       })
       resolve({
         success: true,

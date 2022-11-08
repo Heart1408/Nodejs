@@ -5,7 +5,6 @@ import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
-const expressListRoutes = require('express-list-routes');
 
 let route = express.Router();
 
@@ -14,10 +13,7 @@ const initAPIRoute = (app) => {
   route.post('/token', userController.token);
   route.post('/logout', userController.logout);
 
-  route.get('/product/getListProduct', productController.getListProduct);
-  route.get('/product/getInfoProduct/:id', productController.getInfoProduct);
   route.get('/product/addProductToCart/:productId/:sizeId', verifyToken, productController.addProductToCart);
-  route.get('/product/getRecommendedProduct/:id?', productController.getRecommendedProduct);
 
   route.get('/order/all',verifyRoles('admin'), orderController.getAllOrder);
   route.post('/order/changeStatus',verifyRoles('admin', 'user'), orderController.changeStatusOrder);
@@ -31,5 +27,3 @@ const initAPIRoute = (app) => {
 }
 
 export default initAPIRoute;
-
-//Cái nào cần token thì viết vào đây
