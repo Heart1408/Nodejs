@@ -12,15 +12,15 @@ let getListProduct = (data) => {
         },
         where: {
           [Op.and]: [
-            data.name ? {
+            data.keyword ? {
               name: {
-                [Op.like]: '%' + data.name + '%',
+                [Op.like]: '%' + data.keyword + '%',
               }
             } : null,
             data.category ? { category_id: data.category } : null,
           ]
         },
-        order: data.price ? [['price', data.price]] : null,
+        order: data.sort ? [['price', data.sort]] : null,
         raw: true,
       });
 
