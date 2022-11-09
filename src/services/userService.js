@@ -35,7 +35,7 @@ let handleLogin = (email, password) => {
             resolve({
               success: false,
               errCode: 3,
-              message: 'Wrong password'
+              message: 'Wrong password!'
             })
           }
         } else {
@@ -60,9 +60,7 @@ let handleLogin = (email, password) => {
 
 const generateTokens = payload => {
   const { id, email } = payload
-  const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '150s'
-  });
+  const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET);
   const refreshToken = jwt.sign({ id, email, role: "user" }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: '1d'
   });
@@ -204,9 +202,54 @@ let logout = (refreshToken) => {
   })
 }
 
+let changePassword = (data, userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        attributes: ['password'],
+        where: { id: userId }
+      });
+
+      let check = await bcrypt.compareSync(data.password, user.password);
+      if (!check) {
+        resolve({
+          success: false,
+          errCode: 1,
+          message: 'Wrong password!',
+        })
+      } else if (data.newPassword != data.confirmPassword) {
+        resolve({
+          success: false,
+          errCode: 1,
+          message: 'Password not confirm!',
+        })
+      } else if (data.newPassword === data.password) {
+        resolve({
+          success: false,
+          errCode: 1,
+          message: 'You have not changed your password!',
+        })
+      }
+
+      let hashPassword = await bcrypt.hashSync(data.newPassword, salt);
+      await db.User.update({ password: hashPassword }, {
+        where: { id: userId }
+      });
+
+      resolve({
+        success: true,
+        message: 'Change Password Success!',
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = {
   handleLogin: handleLogin,
   register: register,
   token: token,
   logout: logout,
+  changePassword: changePassword,
 }

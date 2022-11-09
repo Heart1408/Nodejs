@@ -3,21 +3,26 @@ import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-const getPagination = (pageNumber) => {
-  const limit = 10;
-  const offset = pageNumber ? pageNumber * limit : 0;
+const limit = 3;
 
-  return { limit, offset };
+const getPagination = (pageNumber) => {
+  const offset = (pageNumber - 1) * limit;
+  return offset;
 }
 
 let getListProduct = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { limit, offset } = data.pageNumber ? getPagination(data.pageNumber) : [null, null];
+      const offset = data.pageNumber ? getPagination(data.pageNumber) : 0;
+
+      let totalItems = await db.Product.count();
+      let totalPages = Math.ceil(totalItems / limit);
+      let currentPage = data.pageNumber ? data.pageNumber : 1;
 
       let listProduct = await db.Product.findAll({
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ['createdAt', 'updatedAt'],
+
         },
         include: {
           model: db.Product_Category,
@@ -47,6 +52,9 @@ let getListProduct = (data) => {
         resolve({
           sucess: true,
           list_product: listProduct,
+          totalItems: totalItems,
+          totalPages: totalPages,
+          currentPage: currentPage,
         })
       } else {
         resolve({
