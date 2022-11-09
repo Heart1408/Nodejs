@@ -3,7 +3,7 @@ import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-const limit = 3;
+const limit = 2;
 
 const getPagination = (pageNumber) => {
   const offset = (pageNumber - 1) * limit;
