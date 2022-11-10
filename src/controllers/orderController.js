@@ -63,7 +63,7 @@ let orderHistory = async(req, res) => {
             message: 'Missing inputs parameter!'
         })
     }
-    let listOrder = await orderService.orderHistory(userId)
+    let listOrder = await orderService.orderHistory(userId, status)
 
     return res.status(200).json(listOrder);
 }

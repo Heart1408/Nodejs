@@ -4,6 +4,21 @@ let getAllOrder = () => {
     return new Promise(async(resovle, reject) => {
         try {
             let listOrder = await db.Order.findAll({
+                attributes: ['id', 'Address->User.username', 'Address.phone', 'Address.address', 'Address.receiver_name', 'status', 'ordertime', 'delivery'],
+                include: [
+                    {
+                        model: db.Address,
+                        required: true,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.User,
+                                required: true,
+                                attributes: []
+                            }
+                        ]
+                    }
+                ],
                 order: [
                     ['ordertime', 'DESC']
                 ],
