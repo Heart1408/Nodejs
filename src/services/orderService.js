@@ -42,6 +42,16 @@ let getAllOrder = () => {
     }) 
 }
 
+let getAllOrderMonth = (year) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 let changeStatusOrder = (orderId, status) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -64,14 +74,6 @@ let changeStatusOrder = (orderId, status) => {
 let deleteOrder = (orderId) => {
     return new Promise(async(resolve, reject) => {
         try {
-            let isExist = await getOrder(orderId)
-            if (!isExist.success) {
-                resolve({
-                    success: false,
-                    errCode: 1,
-                    message: 'Order is not exist!'
-                })
-            }
             await db.Order.destroy({
                 where: {
                     id: orderId
@@ -89,19 +91,13 @@ let deleteOrder = (orderId) => {
 let orderHistory = (userId, status) => {
     return new Promise(async(resolve, reject) => {
         try {
-            let listOrder = await db.Order.findAll({
-                where: {
-                    user_id: userId,
-                    status: status
-                },
-                raw: true
-            })
+            let result = await getOrderUser(userId);
+            if (status != 0 && result.success) {
+                result.listOrder = result.listOrder.filter(order => order.status == status)
+            }
             
-            if (listOrder) {
-                resolve({
-                    success: true,
-                    listOrder: listOrder
-                })
+            if (result) {
+                resolve(result)
             }
             else {
                 resolve({
@@ -114,10 +110,63 @@ let orderHistory = (userId, status) => {
     })
 }
 
+let getOrderUser = (userId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let listOrder = await db.Order.findAll({
+                attributes: ['id', 'Address->User.username', 'Address.phone', 'Address.address', 'Address.receiver_name', 'status', 'ordertime', 'delivery'],
+                include: [
+                    {
+                        model: db.Address,
+                        required: true,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.User,
+                                required: true,
+                                attributes: []
+                            }
+                        ]
+                    }
+                ],
+                order: [
+                    ['ordertime', 'DESC']
+                ],
+                where: {
+                    '$Address.user_id$': userId
+                },
+                raw: true
+            })
+            if (listOrder) {
+                resolve({
+                    success: true,
+                    listOrder: listOrder
+                })
+            }
+            else {
+                resolve({
+                    success: false
+                })
+            }
+        } catch(e) {
+            reject(e)
+        }
+    })
+}
+
 let getOrder = (orderId) => {
     return new Promise(async(resolve, reject) => {
         try {
             let order = await db.Order.findOne({
+                attributes: ['id', 'Address.user_id', 'Address.phone', 'Address.address', 'Address.receiver_name', 'status', 'ordertime', 'delivery'],
+                include: [
+                    {
+                        model: db.Address, 
+                        required: true,
+                        attributes: []
+                    }
+
+                ],
                 where : {
                     id: orderId
                 },

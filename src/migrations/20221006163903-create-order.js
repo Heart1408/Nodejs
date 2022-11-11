@@ -9,20 +9,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      user_id: {
-        type: Sequelize.INTEGER
-      },
       status: {
         type: Sequelize.INTEGER
       },
-      address: {
-        type: Sequelize.STRING
-      },
-      phone: {
-        type: Sequelize.STRING
-      },
-      receive_name: {
-        type: Sequelize.STRING
+      userInfo: {
+        type: Sequelize.INTEGER
       },
       ordertime: {
         type: Sequelize.DATE

@@ -3,6 +3,7 @@ import userController from "../controllers/userController";
 import productController from '../controllers/productController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
+import addressController from '../controllers/addressController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
 const expressListRoutes = require('express-list-routes');
@@ -26,6 +27,8 @@ const initAPIRoute = (app) => {
   route.get('/order/history/:status',verifyRoles('user'), orderController.orderHistory);
   route.post('/order/create',verifyRoles('user'), orderDetailController.createOrder);
   //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
+
+  route.post('/address/add',verifyRoles('user'), addressController.addAddress);
 
   return app.use('/api', route);
 }
