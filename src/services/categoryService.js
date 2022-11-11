@@ -7,8 +7,7 @@ let getListCategory = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let listCategory = await db.Category.findAll({
-        attributes: ['id', 'name'],
-        where: { type: 1 },
+        attributes: ['id', 'name', 'type'],
         raw: true,
       });
 
