@@ -1,7 +1,7 @@
 import productService from '../services/productService';
 
 let getListProduct = async (req, res) => {
-  let listProduct = await productService.getListProduct(req.body);
+  let listProduct = await productService.getListProduct(req.query);
 
   return res.status(200).json(listProduct);
 }
