@@ -14,8 +14,8 @@ let getInfoProduct = async (req, res) => {
 }
 
 let addProductToCart = async (req, res) => {
-  let productId = req.params.productId;
-  let sizeId = req.params.sizeId;
+  let productId = req.query.productId;
+  let sizeId = req.query.sizeId;
   let userId = req.userId;
   let result = await productService.addProductToCart(productId, sizeId, userId);
 
@@ -23,8 +23,9 @@ let addProductToCart = async (req, res) => {
 }
 
 let getRecommendedProduct = async (req, res) => {
-  let categoryId = req.params.id;
-  let data = await productService.getRecommendedProduct(categoryId);
+  let categoryId = req.query.categoryId;
+  let brandId = req.query.brandId;
+  let data = await productService.getRecommendedProduct(categoryId, brandId);
 
   return res.status(200).json(data);
 }
