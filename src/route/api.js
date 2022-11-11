@@ -3,6 +3,7 @@ import userController from "../controllers/userController";
 import productController from '../controllers/productController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
+import adminProductController from '../controllers/admin/ProductController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
 
@@ -24,6 +25,11 @@ const initAPIRoute = (app) => {
   route.post('/order/create', verifyRoles('user'), orderDetailController.createOrder);
   //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
+
+  //admin
+  route.put('/product/update/:productId', adminProductController.update);
+  route.delete('/product/delete/:productId', adminProductController.deleteProduct);
+  route.post('/product/create', adminProductController.create);
   return app.use('/api', route);
 }
 

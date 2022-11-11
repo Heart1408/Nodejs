@@ -1,4 +1,4 @@
-import category from '../models/category';
+import bodyParser from 'body-parser';
 import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
@@ -15,10 +15,6 @@ let getListProduct = (data) => {
     try {
       const offset = data.pageNumber ? getPagination(data.pageNumber) : 0;
 
-      let totalItems = await db.Product.count();
-      let totalPages = Math.ceil(totalItems / limit);
-      let currentPage = data.pageNumber ? data.pageNumber : 1;
-
       let listProduct = await db.Product.findAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
@@ -27,8 +23,12 @@ let getListProduct = (data) => {
         include: {
           model: db.Product_Category,
           attributes: [],
-          where: data.categoryId ? { 'category_id': data.categoryId } : null,
-          limit: 1,
+          where: {
+            [Op.and]: [
+              data.categoryId ? { 'category_id': data.categoryId } : null,
+              data.brandId ? { 'brand_id': data.brandId } : null
+            ]
+          }
         },
         where: {
           [Op.and]: [
@@ -37,7 +37,6 @@ let getListProduct = (data) => {
                 [Op.like]: '%' + data.keyword + '%',
               }
             } : null,
-            data.category ? { category_id: data.category } : null,
             data.minPrice ? { price: { [Op.gte]: data.minPrice } } : null,
             data.maxPrice ? { price: { [Op.lte]: data.maxPrice } } : null,
           ]
@@ -47,6 +46,10 @@ let getListProduct = (data) => {
         offset,
         raw: true,
       });
+
+      let totalItems = listProduct.length;
+      let totalPages = Math.ceil(totalItems / limit);
+      let currentPage = data.pageNumber ? data.pageNumber : 1;
 
       if (listProduct) {
         resolve({
