@@ -15,10 +15,9 @@ let getListProduct = (data) => {
     try {
       const offset = data.pageNumber ? getPagination(data.pageNumber) : 0;
 
-      let listProduct = await db.Product.findAll({
+      const { count, rows } = await db.Product.findAndCountAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
-
         },
         include: {
           model: db.Product_Category,
@@ -47,14 +46,14 @@ let getListProduct = (data) => {
         raw: true,
       });
 
-      let totalItems = listProduct.length;
+      let totalItems = count;
       let totalPages = Math.ceil(totalItems / limit);
       let currentPage = data.pageNumber ? data.pageNumber : 1;
 
-      if (listProduct) {
+      if (rows) {
         resolve({
           sucess: true,
-          list_product: listProduct,
+          list_product: rows,
           totalItems: totalItems,
           totalPages: totalPages,
           currentPage: currentPage,
@@ -223,10 +222,12 @@ let addProductToCart = (productId, sizeId, userId) => {
 }
 
 // theo so luong san pham ban ra
-let getRecommendedProduct = (categoryId, brandId) => {
+let getRecommendedProduct = (categoryId, brandId, pageNumber) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await db.Product.findAll({
+      const offset = pageNumber ? getPagination(pageNumber) : 0;
+
+      const { count, rows } = await db.Product.findAndCountAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
@@ -234,12 +235,10 @@ let getRecommendedProduct = (categoryId, brandId) => {
           model: db.Product_Category,
           attributes: ['category_id', 'brand_id'],
           where: {
-            [Op.and]: [categoryId ? {
-              category_id: categoryId
-            } : null,
-            brandId ? {
-              brand_id: brandId
-            } : null],
+            [Op.and]: [
+              categoryId ? { category_id: categoryId } : null,
+              brandId ? { brand_id: brandId } : null
+            ]
           }
         },
           // {
@@ -255,11 +254,20 @@ let getRecommendedProduct = (categoryId, brandId) => {
         ],
         // group: ['SizeShoes.product_id'],
         // order: [[sequelize.literal('`SizeShoes.total_sold`'), 'DESC']],
+        limit,
+        offset
       })
+
+      let totalItems = count;
+      let totalPages = Math.ceil(totalItems / limit);
+      let currentPage = pageNumber ? pageNumber : 1;
 
       resolve({
         success: true,
-        data: data
+        data: rows,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        currentPage: currentPage
       })
     } catch (e) {
       reject(e)

@@ -25,7 +25,8 @@ let addProductToCart = async (req, res) => {
 let getRecommendedProduct = async (req, res) => {
   let categoryId = req.query.categoryId;
   let brandId = req.query.brandId;
-  let data = await productService.getRecommendedProduct(categoryId, brandId);
+  let pageNumber = req.query.pageNumber;
+  let data = await productService.getRecommendedProduct(categoryId, brandId, pageNumber);
 
   return res.status(200).json(data);
 }
