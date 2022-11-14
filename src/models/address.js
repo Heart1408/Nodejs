@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Address.belongsTo(models.User, {foreignKey: "user_id"})
       Address.hasMany(models.Order, {foreignKey: "userInfo"})
+      Address.hasOne(models.User, {foreignKey: "address_default"})
     }
   }
   Address.init({

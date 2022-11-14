@@ -30,6 +30,42 @@ let addAdress = (userId, data) => {
     })
 }
 
+let getAllAddress = (userId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let addressList = await db.Address.findAll({
+                attribute: ['id','address', 'phone', 'receiver_name', 'user_id'],
+                include: [
+                    {
+                        model: db.User,
+                        required: true,
+                        attribute: ['address_default']
+                    }
+                ],
+                where: {
+                    user_id: userId
+                },
+                raw: true
+            })
+            console.log(addressList)
+            if (addressList) {
+                resolve({
+                    success: true,
+                    addressList: addressList
+                })
+            }
+            else {
+                resolve({
+                    success: false
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
-    addAdress: addAdress
+    addAdress: addAdress,
+    getAllAddress: getAllAddress
 }

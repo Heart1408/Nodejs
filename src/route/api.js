@@ -28,6 +28,7 @@ const initAPIRoute = (app) => {
   route.post('/order/create',verifyRoles('user'), orderDetailController.createOrder);
   //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
+  route.get('/address'), verifyRoles('user', addressController.getAllAddress);
   route.post('/address/add',verifyRoles('user'), addressController.addAddress);
 
   return app.use('/api', route);

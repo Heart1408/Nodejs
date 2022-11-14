@@ -14,6 +14,13 @@ let addAddress = async(req, res) => {
     return res.status(200).json(success)
 }
 
+let getAllAddress = async(req, res) => {
+    let result = await addressService.getAllAddress(req.userId)
+
+    return res.status(200).json(result)
+}
+
 module.exports = {
-    addAddress: addAddress
+    addAddress: addAddress,
+    getAllAddress: getAllAddress
 }

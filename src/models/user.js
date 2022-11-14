@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       User.hasMany(models.Cart, {foreignKey: 'user_id'})
       User.hasMany(models.Address, {foreignKey: 'user_id'})
+      User.belongsTo(models.Address, {foreignKey: 'address_default'})
     }
   }
   User.init({  
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     avatar: DataTypes.STRING,
     password: DataTypes.STRING,
+    address_default: DataTypes.INTEGER,
     refresh_token: DataTypes.TEXT,
   }, {
     sequelize,
