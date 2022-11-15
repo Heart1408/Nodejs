@@ -14,6 +14,10 @@ let addAdress = (userId, data) => {
                 user_id: userId
             })
 
+            if (data.default) {
+                await updateAddressDefault(userId, userInfo.dataValues.id)
+            }
+
             if (userInfo) {
                 resolve({
                     success: true
@@ -33,21 +37,28 @@ let addAdress = (userId, data) => {
 let getAllAddress = (userId) => {
     return new Promise(async(resolve, reject) => {
         try {
-            let addressList = await db.Address.findAll({
-                attribute: ['id','address', 'phone', 'receiver_name', 'user_id'],
+            let addressList = await db.User.findAll({
+                attributes: ['address_default', 'Addresses.id', 'Addresses.address', 'Addresses.phone', 'Addresses.receiver_name'],
                 include: [
                     {
-                        model: db.User,
+                        model: db.Address,
                         required: true,
-                        attribute: ['address_default']
+                        attributes: []
                     }
                 ],
                 where: {
-                    user_id: userId
+                    id: userId
                 },
                 raw: true
             })
-            console.log(addressList)
+            
+            addressList.forEach(element => {
+                if (element.address_default == element.id) {
+                    element.address_default = true
+                } else {
+                    element.address_default = false
+                }
+            });
             if (addressList) {
                 resolve({
                     success: true,
@@ -65,7 +76,105 @@ let getAllAddress = (userId) => {
     })
 }
 
+let updateAddress = (userId, data) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let result = await db.Address.update({
+                address: data.address,
+                phone: data.phone,
+                receiver_name: data.receiverName
+            }, {
+                where: {
+                    id: data.addressId
+                }
+            })
+
+            if (data.address_default) {
+                updateAddressDefault(userId, data.addressId)
+            }
+
+            if (result) {
+                resolve({
+                    success: true
+                })
+            } else {
+                resolve({
+                    success: false
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+let deleteAddress = (addressId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            await db.Address.destroy({
+                where: {
+                    id: addressId
+                }
+            })
+
+            resolve({
+                success: true
+            })
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
+let getAddressDefault = async(userId) => {
+    let user = await db.User.findOne({
+        where: {
+            id: userId
+        }
+    })
+    return user.address_default
+}
+
+let updateAddressDefault = async(userId, addressId) => {
+    await db.User.update({
+        address_default: addressId
+    },
+    {
+        where: {
+            id: userId
+        }
+    })
+}
+
+let getAddress = (addressId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let address = await db.Address.findOne({
+                where: {
+                    id: addressId
+                }
+            })
+
+            if (address) {
+                resolve({
+                    success: true,
+                    address: address
+                })
+            } else {
+                resolve({
+                    success: false
+                })
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     addAdress: addAdress,
-    getAllAddress: getAllAddress
+    getAllAddress: getAllAddress,
+    updateAddress: updateAddress,
+    getAddress: getAddress,
+    deleteAddress: deleteAddress
 }

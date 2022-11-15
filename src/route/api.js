@@ -4,6 +4,7 @@ import productController from '../controllers/productController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
 import addressController from '../controllers/addressController';
+import profileController from '../controllers/profileController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
 const expressListRoutes = require('express-list-routes');
@@ -28,8 +29,13 @@ const initAPIRoute = (app) => {
   route.post('/order/create',verifyRoles('user'), orderDetailController.createOrder);
   //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
-  route.get('/address'), verifyRoles('user', addressController.getAllAddress);
+  route.get('/address', verifyRoles('user'), addressController.getAllAddress);
   route.post('/address/add',verifyRoles('user'), addressController.addAddress);
+  route.post('/address/update', verifyRoles('user'), addressController.updateAddress);
+  route.post('/address/delete', verifyRoles('user'), addressController.deleteAddress);
+
+  route.get('/profile/:userId', verifyRoles('user', 'admin'), profileController.getProfile);
+  route.post('/profile/update', verifyRoles('admin', 'user'), profileController.updateProfile);
 
   return app.use('/api', route);
 }
