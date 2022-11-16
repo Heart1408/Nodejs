@@ -92,17 +92,20 @@ mysql:
   primary:
     livenessProbe:
       enabled: true
+      initialDelaySeconds: 200
     persistence:
       enabled: true
       storageClass: microk8s-hostpath
     readinessProbe:
       enabled: true
+      initialDelaySeconds: 200
     resources:
       requests:
         cpu: 50m
         memory: 128Mi
     startupProbe:
       enabled: true
+      initialDelaySeconds: 200
 healthcheck: 
   livenessProbe:
     httpGet:
