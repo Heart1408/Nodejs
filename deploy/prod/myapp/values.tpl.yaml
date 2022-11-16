@@ -84,6 +84,7 @@ mysql:
   architecture: standalone
   auth:
     createDatabase: true
+    rootPassword: rootpass
     database: db
     password: pass
     username: user
