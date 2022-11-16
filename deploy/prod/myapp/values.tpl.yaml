@@ -61,11 +61,8 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  limits:
-    cpu: 200m
-    memory: 256Mi
   requests:
-    cpu: 100m
+    cpu: 50m
     memory: 64Mi
 
 
@@ -94,34 +91,31 @@ mysql:
     tag: 8.0.30-debian-11-r19
   primary:
     livenessProbe:
-      enabled: false
+      enabled: true
     persistence:
       enabled: true
       storageClass: microk8s-hostpath
     readinessProbe:
-      enabled: false
+      enabled: true
     resources:
-      limits:
-        cpu: 200m
-        memory: 256Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 128Mi
     startupProbe:
-      enabled: false
-healthcheck: {}
-  # livenessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
-  #   periodSeconds: 5
-  #   initialDelaySeconds: 30
-  # readinessProbe:
-  #   httpGet:
-  #     path: /
-  #     port: http
-  #   periodSeconds: 5
-  #   initialDelaySeconds: 30
+      enabled: true
+healthcheck: 
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 5
+    initialDelaySeconds: 30
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 5
+    initialDelaySeconds: 30
 
 
 sish-client:
