@@ -113,13 +113,19 @@ healthcheck:
       path: /
       port: http
     periodSeconds: 5
-    initialDelaySeconds: 30
+    initialDelaySeconds: 20
   readinessProbe:
     httpGet:
       path: /
       port: http
     periodSeconds: 5
-    initialDelaySeconds: 30
+    initialDelaySeconds: 20
+  startupProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 5
+    initialDelaySeconds: 20
 
 
 sish-client:

@@ -38,7 +38,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              npx sequelize-cli db:migrate
+              cd src && npx sequelize-cli db:migrate
           envFrom:
             - configMapRef:
                 name: {{ include "myapp.fullname" . }}-env
