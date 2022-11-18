@@ -1,9 +1,8 @@
-import bodyParser from 'body-parser';
 import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-const limit = 2;
+const limit = 12;
 
 const getPagination = (pageNumber) => {
   const offset = (pageNumber - 1) * limit;
@@ -70,6 +69,32 @@ let getListProduct = (data) => {
   })
 }
 
+let getRate = (productId, numberRate) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let rows = await db.SizeShoe.findAll({
+        where: { product_id: productId },
+        include: {
+          model: db.OrderDetail,
+          include: {
+            model: db.Review,
+            attributes: [],
+            where: numberRate ? { rate: numberRate } : null
+          },
+        },
+        attributes: [
+          [sequelize.fn('COUNT', sequelize.col('`OrderDetails.review_id`')), 'result']
+        ],
+        raw: true,
+      })
+
+      resolve(rows[0].result)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 let getInfoProduct = (productId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -94,7 +119,45 @@ let getInfoProduct = (productId) => {
         group: ['Size.id'],
         raw: true,
       })
+
+      let comment = await db.OrderDetail.findAll({
+        attributes: [],
+        include: [{
+          model: db.SizeShoe,
+          where: { product_id: productId },
+          attributes: []
+        }, {
+          model: db.Review,
+          attributes: ['rate', 'comment']
+        }, {
+          model: db.Order,
+          attributes: ['id'],
+          include: {
+            model: db.User,
+            attributes: ['username', 'avatar']
+          }
+        }]
+      })
+
+      let datas = []
+      for (let i = 0; i < comment.length; i++) {
+        let data = {
+          rate: comment[i].Review.rate,
+          comment: comment[i].Review.comment,
+          username: comment[i].Order.User.username,
+          avatar: comment[i].Order.User.avatar
+        }
+        datas.push(data);
+      }
+
       productInfo.size_info = size;
+      productInfo.total_rate = await getRate(productId, null)
+      productInfo.rate1 = await getRate(productId, 1)
+      productInfo.rate2 = await getRate(productId, 2)
+      productInfo.rate3 = await getRate(productId, 3)
+      productInfo.rate4 = await getRate(productId, 4)
+      productInfo.rate5 = await getRate(productId, 5)
+      productInfo.comments = datas
 
       if (productInfo) {
         resolve({

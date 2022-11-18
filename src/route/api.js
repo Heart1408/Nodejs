@@ -1,6 +1,7 @@
 import express from "express";
 import userController from "../controllers/userController";
 import productController from '../controllers/productController';
+import cartController from '../controllers/cartController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
 import adminProductController from '../controllers/admin/ProductController';
@@ -16,6 +17,8 @@ const initAPIRoute = (app) => {
   route.post('/changePassword', verifyToken, userController.changePassword);
 
   route.get('/product/addProductToCart', verifyToken, productController.addProductToCart);
+  route.delete('/cart/delete/:productId', verifyToken, cartController.deleteProduct);
+  route.put('/cart/changeAmount', verifyToken, cartController.changeAmount);
 
   route.get('/order/all', verifyRoles('admin'), orderController.getAllOrder);
   route.post('/order/changeStatus', verifyRoles('admin', 'user'), orderController.changeStatusOrder);
