@@ -11,6 +11,9 @@ module.exports = {
         queryInterface.addColumn('Categories', 'description', {
           type: Sequelize.DataTypes.STRING
         }, { transaction: t }),
+        queryInterface.addColumn('Products', 'collection_id', {
+          type: Sequelize.DataTypes.INTEGER
+        }, { transaction: t }),
       ]);
     });
   },
@@ -20,6 +23,7 @@ module.exports = {
       return Promise.all([
         queryInterface.removeColumn('Categories', 'image', { transaction: t }),
         queryInterface.removeColumn('Categories', 'description', { transaction: t }),
+        queryInterface.removeColumn('Products', 'collection_id', { transaction: t }),
       ]);
     });
   }

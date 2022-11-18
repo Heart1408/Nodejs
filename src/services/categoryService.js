@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser';
 import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');

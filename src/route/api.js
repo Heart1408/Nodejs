@@ -5,6 +5,7 @@ import cartController from '../controllers/cartController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
 import adminProductController from '../controllers/admin/ProductController';
+import collectionController from '../controllers/admin/collectionController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
 
@@ -33,6 +34,15 @@ const initAPIRoute = (app) => {
   route.put('/product/update/:productId', adminProductController.update);
   route.delete('/product/delete/:productId', adminProductController.deleteProduct);
   route.post('/product/create', adminProductController.create);
+
+  route.get('/collection/getList', collectionController.getList);
+  route.post('/collection/create', collectionController.create);
+  route.delete('/collection/delete/:collectionId', collectionController.deleteCollection);
+  route.post('/collection/update/:collectionId', collectionController.update);
+  route.get('/collection/getProduct/:collectionId', collectionController.getProduct);
+  route.post('/collection/deleteProduct', collectionController.deleteProduct);
+  route.post('/collection/addProduct', collectionController.addProduct);
+
   return app.use('/api', route);
 }
 
