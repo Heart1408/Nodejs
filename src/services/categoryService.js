@@ -3,11 +3,13 @@ import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-let getListCategory = (data) => {
+let getListCategory = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let listCategory = await db.Category.findAll({
-        attributes: ['id', 'name'],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
         raw: true,
       });
 
