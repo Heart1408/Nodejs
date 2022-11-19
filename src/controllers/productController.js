@@ -14,10 +14,27 @@ let getInfoProduct = async (req, res) => {
 }
 
 let addProductToCart = async (req, res) => {
-  let productId = req.query.productId;
-  let sizeId = req.query.sizeId;
+
+  let { productId, sizeId, amount } = req.query
+
+  if (!productId || !sizeId || !amount) {
+    return res.status(500).json({
+      success: false,
+      errCode: 1,
+      message: 'Missing inputs parameter!',
+    })
+  }
+
+  if (amount < 1) {
+    return res.status(500).json({
+      success: false,
+      errCode: 1,
+      message: 'xxx',
+    })
+  }
+
   let userId = req.userId;
-  let result = await productService.addProductToCart(productId, sizeId, userId);
+  let result = await productService.addProductToCart(req.query, userId);
 
   return res.status(200).json(result);
 }

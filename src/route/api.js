@@ -20,6 +20,7 @@ const initAPIRoute = (app) => {
   route.get('/product/addProductToCart', verifyToken, productController.addProductToCart);
   route.delete('/cart/delete/:productId', verifyToken, cartController.deleteProduct);
   route.put('/cart/changeAmount', verifyToken, cartController.changeAmount);
+  route.get('/cart/getListProduct', verifyToken, cartController.getListProduct);
 
   route.get('/order/all', verifyRoles('admin'), orderController.getAllOrder);
   route.post('/order/changeStatus', verifyRoles('admin', 'user'), orderController.changeStatusOrder);

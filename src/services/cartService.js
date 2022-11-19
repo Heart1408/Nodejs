@@ -89,7 +89,54 @@ let changeAmount = (data, userId) => {
   })
 }
 
+let getListProduct = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let cart = await db.Cart.findAll({
+        where: { user_id: userId },
+        attributes: ['id', 'amount'],
+        include: {
+          model: db.SizeShoe,
+          attributes: ['id'],
+          include: [{
+            model: db.Size,
+            attributes: ['size'],
+          }, {
+            model: db.Product,
+            attributes: ['image', 'name', 'price']
+          }]
+        },
+        raw: true,
+      })
+
+      console.log(cart)
+
+      let carts = []
+      for (let i = 0; i < cart.length; i++) {
+        let record = {
+          id: cart[i].id,
+          name: cart[i]['SizeShoe.Product.name'],
+          image: cart[i]['SizeShoe.Product.image'],
+          size: cart[i]['SizeShoe.Size.size'],
+          price: cart[i]['SizeShoe.Product.price'],
+          amount: cart[i].amount
+        }
+
+        carts.push(record)
+      }
+
+      resolve({
+        success: true,
+        carts: carts
+      })
+    } catch (e) {
+      reject(e);
+    }
+  })
+}
+
 module.exports = {
   deleteProduct: deleteProduct,
   changeAmount: changeAmount,
+  getListProduct: getListProduct
 }

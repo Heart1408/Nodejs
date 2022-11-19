@@ -176,10 +176,10 @@ let getInfoProduct = (productId) => {
   })
 }
 
-let addProductToCart = (productId, sizeId, userId) => {
+let addProductToCart = (data, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let product = await db.Product.findByPk(productId);
+      let product = await db.Product.findByPk(data.productId);
       if (!product) {
         resolve({
           success: false,
@@ -188,7 +188,7 @@ let addProductToCart = (productId, sizeId, userId) => {
       }
 
       let sizeshoe = await db.SizeShoe.findOne({
-        where: { product_id: productId, size_id: sizeId }
+        where: { product_id: data.productId, size_id: data.sizeId }
       })
 
       if (!sizeshoe) {
@@ -202,7 +202,7 @@ let addProductToCart = (productId, sizeId, userId) => {
         attributes: ['id'],
         include: {
           model: db.Product_Category,
-          where: { product_id: productId },
+          where: { product_id: data.productId },
           attributes: []
         },
         raw: true,
@@ -212,7 +212,7 @@ let addProductToCart = (productId, sizeId, userId) => {
         attributes: ['id'],
         include: {
           model: db.Product_Category,
-          where: { product_id: productId },
+          where: { product_id: data.productId },
           attributes: []
         },
         raw: true,
@@ -223,22 +223,23 @@ let addProductToCart = (productId, sizeId, userId) => {
       });
 
       if (cart) {
-        if (cart.amount < sizeshoe.amount) {
-          cart.amount += 1;
+        let total_amount = parseInt(cart.amount)+parseInt(data.amount)
+        if (total_amount <= sizeshoe.amount) {
+          cart.amount = total_amount;
           await cart.save();
 
           let productInfo = await db.Product.findOne({
             attributes: {
               exclude: ['createdAt', 'updatedAt']
             },
-            where: { id: productId },
+            where: { id: data.productId },
             raw: true,
           })
-          let size = await db.Size.findOne({ attributes: ['size'], where: { id: sizeId } })
+          let size = await db.Size.findOne({ attributes: ['size'], where: { id: data.sizeId } })
           productInfo.category_id = category.id
           productInfo.brand_id = brand.id
           productInfo.size = size.size
-          productInfo.sizeId = sizeId
+          productInfo.sizeId = data.sizeId
           productInfo.amount = cart.amount
 
           resolve({
@@ -263,13 +264,13 @@ let addProductToCart = (productId, sizeId, userId) => {
           attributes: {
             exclude: ['createdAt', 'updatedAt']
           },
-          where: { id: productId },
+          where: { id: data.productId },
           raw: true,
         });
         let size = await db.Size.findOne({ where: { id: sizeId }, attributes: ['size'] });
         product.category_id = category.id
         product.brand_id = brand.id
-        product.sizeId = sizeId
+        product.sizeId = data.sizeId
         product.size = size;
         product.amount = cart.amount;
 

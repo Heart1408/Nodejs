@@ -15,7 +15,15 @@ let changeAmount = async (req, res) => {
   return res.status(200).json(result);
 }
 
+let getListProduct = async (req, res) => {
+  let userId = req.userId;
+  let result = await cartService.getListProduct(userId);
+
+  return res.status(200).json(result);
+}
+
 module.exports = {
   deleteProduct: deleteProduct,
-  changeAmount: changeAmount
+  changeAmount: changeAmount,
+  getListProduct: getListProduct
 }
