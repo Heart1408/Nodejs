@@ -341,9 +341,26 @@ let getRecommendedProduct = (categoryId, brandId, pageNumber) => {
   })
 }
 
+let getListSize = (categoryId, brandId, pageNumber) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await db.Size.findAll({
+        attributes: ['id', 'size']
+      })
+      resolve({
+        success: true,
+        data: data
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = {
   getListProduct: getListProduct,
   getInfoProduct: getInfoProduct,
   addProductToCart: addProductToCart,
   getRecommendedProduct: getRecommendedProduct,
+  getListSize: getListSize
 }

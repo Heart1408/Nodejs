@@ -48,9 +48,16 @@ let getRecommendedProduct = async (req, res) => {
   return res.status(200).json(data);
 }
 
+let getListSize = async (req, res) => {
+  let data = await productService.getListSize()
+
+  return res.status(200).json(data);
+}
+
 module.exports = {
   getListProduct: getListProduct,
   getInfoProduct: getInfoProduct,
   addProductToCart: addProductToCart,
   getRecommendedProduct: getRecommendedProduct,
+  getListSize: getListSize
 }
