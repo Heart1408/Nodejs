@@ -26,7 +26,8 @@ let getListProduct = (data) => {
               data.categoryId ? { 'category_id': data.categoryId } : null,
               data.brandId ? { 'brand_id': data.brandId } : null
             ]
-          }
+          },
+          limit: 1
         },
         where: {
           [Op.and]: [
@@ -188,7 +189,8 @@ let addProductToCart = (data, userId) => {
       }
 
       let sizeshoe = await db.SizeShoe.findOne({
-        where: { product_id: data.productId, size_id: data.sizeId }
+        where: { product_id: data.productId, size_id: data.sizeId },
+        // raw: true
       })
 
       if (!sizeshoe) {
@@ -223,7 +225,7 @@ let addProductToCart = (data, userId) => {
       });
 
       if (cart) {
-        let total_amount = parseInt(cart.amount)+parseInt(data.amount)
+        let total_amount = parseInt(cart.amount) + parseInt(data.amount)
         if (total_amount <= sizeshoe.amount) {
           cart.amount = total_amount;
           await cart.save();
@@ -267,7 +269,7 @@ let addProductToCart = (data, userId) => {
           where: { id: data.productId },
           raw: true,
         });
-        let size = await db.Size.findOne({ where: { id: sizeId }, attributes: ['size'] });
+        let size = await db.Size.findOne({ where: { id: data.sizeId }, attributes: ['size'] });
         product.category_id = category.id
         product.brand_id = brand.id
         product.sizeId = data.sizeId
