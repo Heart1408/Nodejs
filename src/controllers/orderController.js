@@ -48,6 +48,25 @@ let deleteOrder = async (req, res) => {
             message: 'Missing inputs parameter!'
         })
     }
+    let order = await getOrder(orderId);
+    if (!order) {
+        return res.status(500).json({
+            success: false,
+            errCode: 1,
+            message: 'Order not found'
+        })
+    }
+
+    console.log(req)
+    if (req.role == "user") {
+        if (req.userId != order.user_id) {
+            return res.status(401).json({
+                success: false,
+                errCode: 1,
+                message: 'You do not have access!'
+              })
+        }
+    }
     let success = await orderService.deleteOrder(orderId)
 
     return res.status(200).json(success);
@@ -63,7 +82,7 @@ let orderHistory = async (req, res) => {
             message: 'Missing inputs parameter!'
         })
     }
-    let listOrder = await orderService.orderHistory(userId)
+    let listOrder = await orderService.orderHistory(userId, status)
 
     return res.status(200).json(listOrder);
 }
