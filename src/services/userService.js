@@ -60,7 +60,9 @@ let handleLogin = (email, password) => {
 
 const generateTokens = payload => {
   const { id, email } = payload
-  const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET);
+  const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '150s'
+  });
   const refreshToken = jwt.sign({ id, email, role: "user" }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: '1d'
   });
@@ -87,7 +89,7 @@ let token = (refreshToken) => {
         const id = user[0].id;
         const email = user[0].email;
         const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
-          expiresIn: '150s'
+          expiresIn: '1d'
         });
 
         resolve({

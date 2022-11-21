@@ -13,5 +13,6 @@ router.get('/api/product/getInfoProduct/:id', productController.getInfoProduct);
 router.get('/api/product/getRecommendedProduct/:id?', productController.getRecommendedProduct);
 router.get('/api/category/getList', categoryController.getList);
 
-router.post('api/admin/login', adminController.handleLogin);
+router.post('/api/admin/login', adminController.handleLogin);
+
 module.exports = router;

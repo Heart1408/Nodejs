@@ -1,10 +1,11 @@
 import adminService from '../../services/admin/adminLoginService';
 
 let handleLogin = async (req, res) => {
+  console.log("kak")
   let username = req.body.username;
   let password = req.body.password;
 
-  if (!email || !password) {
+  if (!username || !password) {
     return res.status(500).json({
       success: false,
       errCode: 1,

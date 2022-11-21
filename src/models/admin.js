@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
     fullname: DataTypes.STRING,
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
-    role: DataTypes.INTEGER
+    role: DataTypes.INTEGER,
+    refresh_token: DataTypes.TEXT,
   }, {
     sequelize,
     modelName: 'Admin',
