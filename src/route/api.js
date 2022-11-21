@@ -1,9 +1,11 @@
 import express from "express";
 import userController from "../controllers/userController";
 import productController from '../controllers/productController';
+import cartController from '../controllers/cartController';
 import orderController from '../controllers/orderController';
 import orderDetailController from '../controllers/orderDetailController';
 import adminProductController from '../controllers/admin/ProductController';
+import collectionController from '../controllers/admin/collectionController';
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
 
@@ -15,7 +17,10 @@ const initAPIRoute = (app) => {
   route.post('/logout', verifyToken, userController.logout);
   route.post('/changePassword', verifyToken, userController.changePassword);
 
-  route.get('/product/addProductToCart/:productId/:sizeId', verifyToken, productController.addProductToCart);
+  route.get('/product/addProductToCart', verifyToken, productController.addProductToCart);
+  route.delete('/cart/delete/:productId', verifyToken, cartController.deleteProduct);
+  route.put('/cart/changeAmount', verifyToken, cartController.changeAmount);
+  route.get('/cart/getListProduct', verifyToken, cartController.getListProduct);
 
   route.get('/order/all', verifyRoles('admin'), orderController.getAllOrder);
   route.post('/order/changeStatus', verifyRoles('admin', 'user'), orderController.changeStatusOrder);
@@ -30,6 +35,15 @@ const initAPIRoute = (app) => {
   route.put('/product/update/:productId', adminProductController.update);
   route.delete('/product/delete/:productId', adminProductController.deleteProduct);
   route.post('/product/create', adminProductController.create);
+
+  route.get('/collection/getList', collectionController.getList);
+  route.post('/collection/create', collectionController.create);
+  route.delete('/collection/delete/:collectionId', collectionController.deleteCollection);
+  route.post('/collection/update/:collectionId', collectionController.update);
+  route.get('/collection/getProduct/:collectionId', collectionController.getProduct);
+  route.post('/collection/deleteProduct', collectionController.deleteProduct);
+  route.post('/collection/addProduct', collectionController.addProduct);
+
   return app.use('/api', route);
 }
 

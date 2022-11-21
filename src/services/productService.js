@@ -1,9 +1,8 @@
-import bodyParser from 'body-parser';
 import db from '../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-const limit = 2;
+const limit = 12;
 
 const getPagination = (pageNumber) => {
   const offset = (pageNumber - 1) * limit;
@@ -15,20 +14,20 @@ let getListProduct = (data) => {
     try {
       const offset = data.pageNumber ? getPagination(data.pageNumber) : 0;
 
-      let totalItems = await db.Product.count();
-      let totalPages = Math.ceil(totalItems / limit);
-      let currentPage = data.pageNumber ? data.pageNumber : 1;
-
-      let listProduct = await db.Product.findAll({
+      const { count, rows } = await db.Product.findAndCountAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt'],
-
         },
         include: {
           model: db.Product_Category,
           attributes: [],
-          where: data.categoryId ? { 'category_id': data.categoryId } : null,
-          limit: 1,
+          where: {
+            [Op.and]: [
+              data.categoryId ? { 'category_id': data.categoryId } : null,
+              data.brandId ? { 'brand_id': data.brandId } : null
+            ]
+          },
+          limit: 1
         },
         where: {
           [Op.and]: [
@@ -37,7 +36,6 @@ let getListProduct = (data) => {
                 [Op.like]: '%' + data.keyword + '%',
               }
             } : null,
-            data.category ? { category_id: data.category } : null,
             data.minPrice ? { price: { [Op.gte]: data.minPrice } } : null,
             data.maxPrice ? { price: { [Op.lte]: data.maxPrice } } : null,
           ]
@@ -48,10 +46,14 @@ let getListProduct = (data) => {
         raw: true,
       });
 
-      if (listProduct) {
+      let totalItems = count;
+      let totalPages = Math.ceil(totalItems / limit);
+      let currentPage = data.pageNumber ? data.pageNumber : 1;
+
+      if (rows) {
         resolve({
           sucess: true,
-          list_product: listProduct,
+          list_product: rows,
           totalItems: totalItems,
           totalPages: totalPages,
           currentPage: currentPage,
@@ -64,6 +66,32 @@ let getListProduct = (data) => {
       }
     } catch (e) {
       reject(e);
+    }
+  })
+}
+
+let getRate = (productId, numberRate) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let rows = await db.SizeShoe.findAll({
+        where: { product_id: productId },
+        include: {
+          model: db.OrderDetail,
+          include: {
+            model: db.Review,
+            attributes: [],
+            where: numberRate ? { rate: numberRate } : null
+          },
+        },
+        attributes: [
+          [sequelize.fn('COUNT', sequelize.col('`OrderDetails.review_id`')), 'result']
+        ],
+        raw: true,
+      })
+
+      resolve(rows[0].result)
+    } catch (e) {
+      reject(e)
     }
   })
 }
@@ -81,7 +109,7 @@ let getInfoProduct = (productId) => {
 
       let size = await db.Size.findAll({
         attributes: [
-          'size',
+          'id', 'size',
           [sequelize.fn('SUM', sequelize.col('sizeshoes.amount')), 'amount']
         ],
         include: [{
@@ -92,7 +120,45 @@ let getInfoProduct = (productId) => {
         group: ['Size.id'],
         raw: true,
       })
+
+      let comment = await db.OrderDetail.findAll({
+        attributes: [],
+        include: [{
+          model: db.SizeShoe,
+          where: { product_id: productId },
+          attributes: []
+        }, {
+          model: db.Review,
+          attributes: ['rate', 'comment']
+        }, {
+          model: db.Order,
+          attributes: ['id'],
+          include: {
+            model: db.User,
+            attributes: ['username', 'avatar']
+          }
+        }]
+      })
+
+      let datas = []
+      for (let i = 0; i < comment.length; i++) {
+        let data = {
+          rate: comment[i].Review.rate,
+          comment: comment[i].Review.comment,
+          username: comment[i].Order.User.username,
+          avatar: comment[i].Order.User.avatar
+        }
+        datas.push(data);
+      }
+
       productInfo.size_info = size;
+      productInfo.total_rate = await getRate(productId, null)
+      productInfo.rate1 = await getRate(productId, 1)
+      productInfo.rate2 = await getRate(productId, 2)
+      productInfo.rate3 = await getRate(productId, 3)
+      productInfo.rate4 = await getRate(productId, 4)
+      productInfo.rate5 = await getRate(productId, 5)
+      productInfo.comments = datas
 
       if (productInfo) {
         resolve({
@@ -103,7 +169,6 @@ let getInfoProduct = (productId) => {
         resolve({
           success: false,
           message: 'abc',
-          // product_info: [],
         })
       }
     } catch (e) {
@@ -112,38 +177,71 @@ let getInfoProduct = (productId) => {
   })
 }
 
-let addProductToCart = (productId, sizeId, userId) => {
+let addProductToCart = (data, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let sizeshoe = await db.SizeShoe.findOne({
-        where: { product_id: productId, size_id: sizeId }
-      })
-
-      if (!sizeshoe) {
+      let product = await db.Product.findByPk(data.productId);
+      if (!product) {
         resolve({
           success: false,
           message: 'Sản phẩm không tồn tại!',
         })
       }
 
+      let sizeshoe = await db.SizeShoe.findOne({
+        where: { product_id: data.productId, size_id: data.sizeId },
+        // raw: true
+      })
+
+      if (!sizeshoe) {
+        resolve({
+          success: false,
+          message: 'Sản phẩm đã hết size.',
+        })
+      }
+
+      let category = await db.Category.findOne({
+        attributes: ['id'],
+        include: {
+          model: db.Product_Category,
+          where: { product_id: data.productId },
+          attributes: []
+        },
+        raw: true,
+      })
+
+      let brand = await db.Brand.findOne({
+        attributes: ['id'],
+        include: {
+          model: db.Product_Category,
+          where: { product_id: data.productId },
+          attributes: []
+        },
+        raw: true,
+      })
+
       let cart = await db.Cart.findOne({
         where: { sizeshoe_id: sizeshoe.id, user_id: userId }
       });
 
       if (cart) {
-        if (cart.amount < sizeshoe.amount) {
-          cart.amount += 1;
+        let total_amount = parseInt(cart.amount) + parseInt(data.amount)
+        if (total_amount <= sizeshoe.amount) {
+          cart.amount = total_amount;
           await cart.save();
 
           let productInfo = await db.Product.findOne({
             attributes: {
               exclude: ['createdAt', 'updatedAt']
             },
-            where: { id: productId },
+            where: { id: data.productId },
             raw: true,
           })
-          let size = await db.Size.findOne({ attributes: ['size'], where: { id: sizeId } })
+          let size = await db.Size.findOne({ attributes: ['size'], where: { id: data.sizeId } })
+          productInfo.category_id = category.id
+          productInfo.brand_id = brand.id
           productInfo.size = size.size
+          productInfo.sizeId = data.sizeId
           productInfo.amount = cart.amount
 
           resolve({
@@ -168,10 +266,13 @@ let addProductToCart = (productId, sizeId, userId) => {
           attributes: {
             exclude: ['createdAt', 'updatedAt']
           },
-          where: { id: productId },
+          where: { id: data.productId },
           raw: true,
         });
-        let size = await db.Size.findOne({ where: { id: sizeId }, attributes: ['size'] });
+        let size = await db.Size.findOne({ where: { id: data.sizeId }, attributes: ['size'] });
+        product.category_id = category.id
+        product.brand_id = brand.id
+        product.sizeId = data.sizeId
         product.size = size;
         product.amount = cart.amount;
 
@@ -187,33 +288,64 @@ let addProductToCart = (productId, sizeId, userId) => {
 }
 
 // theo so luong san pham ban ra
-let getRecommendedProduct = (categoryId) => {
+let getRecommendedProduct = (categoryId, brandId, pageNumber) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await db.Product.findAll({
+      const offset = pageNumber ? getPagination(pageNumber) : 0;
+
+      const { count, rows } = await db.Product.findAndCountAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
         include: [{
-          model: db.SizeShoe,
-          include: [{
-            model: db.OrderDetail,
-            // require: true,
-            attributes: []
-          }],
-
-          attributes: [
-            [sequelize.fn('SUM', sequelize.col('SizeShoes.OrderDetails.amount')), 'total_sold']
-          ]
-        },
-        {
           model: db.Product_Category,
-          attributes: [],
-          where: categoryId ? { 'category_id': categoryId } : null,
-        }
+          attributes: ['category_id', 'brand_id'],
+          where: {
+            [Op.and]: [
+              categoryId ? { category_id: categoryId } : null,
+              brandId ? { brand_id: brandId } : null
+            ]
+          }
+        },
+          // {
+          //   model: db.SizeShoe,
+          //   include: [{
+          //     model: db.OrderDetail,
+          //     attributes: []
+          //   }],
+          // attributes: [
+          //   [sequelize.fn('SUM', sequelize.col('SizeShoes.OrderDetails.amount')), 'total_sold']
+          // ]
+          // }
         ],
-        group: ['SizeShoes.product_id'],
-        order: [[sequelize.literal('`SizeShoes.total_sold`'), 'DESC']],
+        // group: ['SizeShoes.product_id'],
+        // order: [[sequelize.literal('`SizeShoes.total_sold`'), 'DESC']],
+        limit,
+        offset
+      })
+
+      let totalItems = count;
+      let totalPages = Math.ceil(totalItems / limit);
+      let currentPage = pageNumber ? pageNumber : 1;
+
+      resolve({
+        success: true,
+        data: rows,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        currentPage: currentPage
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+let getListSize = (categoryId, brandId, pageNumber) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const data = await db.Size.findAll({
+        attributes: ['id', 'size']
       })
       resolve({
         success: true,
@@ -230,4 +362,5 @@ module.exports = {
   getInfoProduct: getInfoProduct,
   addProductToCart: addProductToCart,
   getRecommendedProduct: getRecommendedProduct,
+  getListSize: getListSize
 }

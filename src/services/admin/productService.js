@@ -18,7 +18,7 @@ let createProduct = (data) => {
         category_id: data.categoryId,
       });
 
-      let productSize = [];
+      let productSize = []; 
       if (data.sizes) {
         for (let i = 0; i < data.sizes.length; i++) {
           let record = {

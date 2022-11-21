@@ -9,7 +9,9 @@ router.post('/api/register', userController.register);
 
 router.get('/api/product/getListProduct', productController.getListProduct);
 router.get('/api/product/getInfoProduct/:id', productController.getInfoProduct);
-router.get('/api/product/getRecommendedProduct/:id?', productController.getRecommendedProduct);
+router.get('/api/getListSize', productController.getListSize);
+
+router.get('/api/product/getRecommendedProduct', productController.getRecommendedProduct);
 router.get('/api/category/getList', categoryController.getList);
 
 module.exports = router;
