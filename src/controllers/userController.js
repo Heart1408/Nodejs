@@ -16,7 +16,7 @@ let handleLogin = async (req, res) => {
   if (!result.success) {
     return res.status(500).json(result)
   }
-  
+
   res.cookie('refreshToken', result.token.refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 100
@@ -65,7 +65,23 @@ let logout = async (req, res) => {
   let result = await userService.logout(refreshToken);
   res.clearCookie('refreshToken');
 
-  return res.status(200).json(result)
+  return res.status(200).json(result);
+}
+
+let changePassword = async (req, res) => {
+  let userId = req.userId;
+  let { password, newPassword, confirmPassword } = req.body
+
+  if (!password || !newPassword || !confirmPassword) {
+    return res.status(500).json({
+      success: false,
+      errCode: 1,
+      message: 'Missing inputs parameter!',
+    })
+  }
+  let result = await userService.changePassword(req.body, userId);
+
+  return res.status(200).json(result);
 }
 
 module.exports = {
@@ -73,4 +89,5 @@ module.exports = {
   register: register,
   token: token,
   logout: logout,
+  changePassword: changePassword,
 }

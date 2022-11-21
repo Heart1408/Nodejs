@@ -1,6 +1,6 @@
 import orderService from '../services/orderService'
 
-let getAllOrder = async(req, res) => {
+let getAllOrder = async (req, res) => {
     let listAllOrder = await orderService.getAllOrder();
 
     return res.status(200).json(listAllOrder);
@@ -13,7 +13,7 @@ let changeStatusOrder = async (req, res) => {
             success: false,
             errCode: 1,
             message: 'Missing inputs parameter!'
-          })
+        })
     }
     let order = await getOrder(orderId);
     if (!order) {
@@ -30,10 +30,10 @@ let changeStatusOrder = async (req, res) => {
                 success: false,
                 errCode: 1,
                 message: 'You do not have access!'
-              })
+            })
         }
     }
-    
+
     let success = await orderService.changeStatusOrder(orderId, status)
 
     return res.status(200).json(success);
@@ -72,7 +72,7 @@ let deleteOrder = async (req, res) => {
     return res.status(200).json(success);
 }
 
-let orderHistory = async(req, res) => {
+let orderHistory = async (req, res) => {
     let userId = req.userId
     let status = req.params.status
     if (!status) {
@@ -87,7 +87,7 @@ let orderHistory = async(req, res) => {
     return res.status(200).json(listOrder);
 }
 
-let getOrder = async(orderId) => {
+let getOrder = async (orderId) => {
     let order = await orderService.getOrder(orderId)
     if (order.success) {
         return order.order
