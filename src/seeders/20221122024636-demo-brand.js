@@ -3,28 +3,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('Categories', [{
-      name: "Man",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      name: "Woman",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      name: "Kids",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      name: "Sports",
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
+    return queryInterface.bulkInsert('Brands', [
     {
       name: "Abc",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      name: "Converse",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      name: "Adidas",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      name: "Nike",
       createdAt: new Date(),
       updatedAt: new Date()
     }]);
