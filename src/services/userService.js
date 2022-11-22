@@ -61,7 +61,7 @@ let handleLogin = (email, password) => {
 const generateTokens = payload => {
   const { id, email } = payload
   const accessToken = jwt.sign({ id, email, role: "user" }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '150s'
+    expiresIn: '1d'
   });
   const refreshToken = jwt.sign({ id, email, role: "user" }, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: '1d'

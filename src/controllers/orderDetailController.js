@@ -43,6 +43,17 @@ let createOrder = async(req, res) => {
             message: 'Missing inputs parameter!'
         })
     }
+
+    for (let i = 0; i < data.products.length; i++) {
+        let quantityInStock = await orderDetailService.getProductSizeId(data.products[i].id, data.products[i].size)
+        if (data.products[i].amount > quantityInStock.amount) {
+            return res.status(500).json({
+                success: false,
+                errCode: 2,
+                message: "Sản phẩm vượt quá số lượng"
+            })
+        }
+    }
     let success = await orderDetailService.createOrder(data.products, data.address)
 
     return res.status(200).json(success);
