@@ -3,6 +3,7 @@ const router = express.Router();
 import userController from "../controllers/userController";
 import productController from '../controllers/productController';
 import categoryController from '../controllers/categoryController';
+import adminController from '../controllers/admin/LoginController';
 
 router.post('/api/login', userController.handleLogin);
 router.post('/api/register', userController.register);
@@ -13,5 +14,7 @@ router.get('/api/getListSize', productController.getListSize);
 
 router.get('/api/product/getRecommendedProduct', productController.getRecommendedProduct);
 router.get('/api/category/getList', categoryController.getList);
+
+router.post('/api/admin/login', adminController.handleLogin);
 
 module.exports = router;
