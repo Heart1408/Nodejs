@@ -11,7 +11,7 @@ module.exports = {
     data.forEach(element => {
       products.push({
         name: element.name,
-        description: element.brand,
+        description: "Giày chất lượng cao, bảo hành đổi trả 1 tháng",
         image: element.imageURL,
         price: element.price,
         createdAt: new Date(),

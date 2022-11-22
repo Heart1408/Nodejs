@@ -13,7 +13,9 @@ app.use(cookies());
 let port = process.env.PORT || 8000;
 
 var cors = require('cors')
-app.use(cors())
+app.use(cors({
+  credentials: true
+}))
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 })

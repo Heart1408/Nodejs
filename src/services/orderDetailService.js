@@ -5,7 +5,7 @@ let getDetailOrder = (orderId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let listProduct = await db.OrderDetail.findAll({
-                attributes: ['id', 'amount', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
+                attributes: ['id', 'amount', 'SizeShoe.product_id', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
                 include: [
                     {
                         model: db.SizeShoe,
@@ -61,11 +61,19 @@ let createOrder = (products, address) => {
             let detailData = []
 
             for (let i = 0; i < products.length; i++) {
+                let productSize = await getProductSizeId(products[i].id, products[i].size)
                 let record = {
                     order_id: order.id,
-                    product_size_id: await getProductSizeId(products[i].id, products[i].size),
+                    product_size_id: productSize.id,
                     amount: products[i].amount
                 }
+                await db.SizeShoe.update({
+                    amount: productSize.amount - products[i].amount
+                }, {
+                    where: {
+                        id: productSize.id
+                    }
+                })
                 detailData.push(record);                
             }
             
@@ -95,10 +103,11 @@ let getProductSizeId = async(productId, sizeId) => {
         },
         raw: true
     })
-    return id.id
+    return id
 }
 
 module.exports = {
     getDetailOrder: getDetailOrder,
-    createOrder: createOrder
+    createOrder: createOrder,
+    getProductSizeId: getProductSizeId
 }

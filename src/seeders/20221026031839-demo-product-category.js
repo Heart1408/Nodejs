@@ -4,10 +4,11 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     let products = []
-    for (let i = 0; i< 50; i++) {
+    for (let i = 0; i< 34; i++) {
       products.push({
-        product_id: Math.floor(Math.random() * 30 + 1),
-        category_id: Math.floor(Math.random() * 7 + 1),
+        product_id: i,
+        category_id: Math.floor(Math.random() * 3 + 1),
+        brand_id: Math.floor(Math.random() * 3 + 1),
         createdAt: new Date(),
         updatedAt: new Date()
       })

@@ -3,13 +3,13 @@ import db from '../../models/index';
 const { Op } = require("sequelize");
 var sequelize = require('sequelize');
 
-let createProduct = (data) => {
+let createProduct = (data, image) => {
   return new Promise(async (resolve, reject) => {
     try {
       let newProduct = await db.Product.create({
         name: data.name,
         price: data.price,
-        image: data.image,
+        image: image,
         description: data.description,
       });
 
