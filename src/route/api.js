@@ -40,7 +40,7 @@ const initAPIRoute = (app) => {
   route.post('/address/delete', verifyRoles('user'), addressController.deleteAddress);
 
   route.get('/profile/:userId', verifyRoles('user', 'admin'), profileController.getProfile);
-  route.post('/profile/update', verifyRoles('admin', 'user'), profileController.updateProfile);
+  route.post('/profile/update', verifyRoles('admin', 'user'), fileUploader.single('file') , profileController.updateProfile);
 
   //admin
   route.put('/product/update/:productId', adminProductController.update);

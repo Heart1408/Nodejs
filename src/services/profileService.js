@@ -26,7 +26,7 @@ let getProfile = (userId) => {
     })
 }
 
-let updateProfile = (data) => {
+let updateProfile = (data, image) => {
     return new Promise(async(resolve, reject) => {
         try {
             let result = await db.User.update({
@@ -34,7 +34,7 @@ let updateProfile = (data) => {
                 name: data.name,
                 email: data.email,
                 phone: data.phone,
-                avatar: data.avatar
+                avatar: image
             }, {
                 where: {
                     id: data.userId
