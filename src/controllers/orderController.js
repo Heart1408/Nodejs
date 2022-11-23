@@ -25,7 +25,7 @@ let changeStatusOrder = async (req, res) => {
     }
 
     if (req.role == "user") {
-        if (req.id != order.user_id) {
+        if (req.userId != order.user_id) {
             return res.status(401).json({
                 success: false,
                 errCode: 1,

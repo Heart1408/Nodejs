@@ -55,13 +55,22 @@ let getAllOrderMonth = (year) => {
 let changeStatusOrder = (orderId, status) => {
     return new Promise(async(resolve, reject) => {
         try {
-            await db.Order.update({
-                status: status
-            }, {
-                where: {
-                    id: orderId
-                }
-            })
+            if (status == 4) {
+                await db.Order.update({
+                    status: status,
+                    delivery: new Date()
+                }, {
+                    where: { id: orderId }
+                })
+            } else {
+                await db.Order.update({
+                    status: status
+                }, {
+                    where: {
+                        id: orderId
+                    }
+                })
+            }
             resolve({
                 success: true
             })
