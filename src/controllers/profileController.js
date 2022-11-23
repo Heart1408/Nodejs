@@ -22,7 +22,8 @@ let getProfile = async(req, res) => {
     return res.status(200).json(profile)
 }
 let updateProfile = async(req, res) => {
-    if (!req.body.userId || !req.body.email || !req.body.name || !req.body.username || !req.body.phone) {
+    console.log(req.body)
+    if (!req.body.userId || !req.body.email || !req.body.name || !req.body.username || !req.body.phone || !req.file) {
         return res.status(500).json({
             success: false,
             errCode: 1,
@@ -38,7 +39,7 @@ let updateProfile = async(req, res) => {
         })
     }
 
-    let result = await profileService.updateProfile(req.body)
+    let result = await profileService.updateProfile(req.body, req.file.path)
 
     return res.status(200).json(result)
 }
