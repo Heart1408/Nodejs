@@ -6,11 +6,10 @@ let getSaleWeek = () => {
             let week = new Date()
             week.setDate(week.getDate() - 14)
             let lastWeek = formatDate(week)
-            console.log(week)
             let total = await db.Order.findAll({
                 attributes: [
                     [sequelize.fn('DATE', sequelize.col('delivery')), 'Date'],
-                    [sequelize.fn('SUM', sequelize.col('OrderDetails->SizeShoe->Product.price') ), 'total']
+                    [sequelize.fn('SUM', sequelize.where(sequelize.col('OrderDetails->SizeShoe->Product.price'), '*' ,sequelize.col('OrderDetails.amount'))), 'total']
                 ],
                 include: [
                     {
@@ -33,11 +32,34 @@ let getSaleWeek = () => {
                         ]
                     }
                 ],
-                //
                 where : sequelize.where( sequelize.fn('DATE', sequelize.col('delivery')), '>', lastWeek),
                 group: 'Date',
                 raw: true
             })
+
+            let todayDay = new Date().getDay()
+            if (todayDay == 0) {
+                todayDay = 6
+            } else {
+                todayDay = todayDay - 1
+            }
+            let mondayLastWeek = new Date()
+            mondayLastWeek.setDate(mondayLastWeek.getDate() - 8 - todayDay)
+            let dataLastWeek = []
+            for (let i = 0; i < 7; i++) {
+                mondayLastWeek.setDate(mondayLastWeek.getDate() + 1)
+                for (let j = 0; j < total.length; j++) {
+                    if (total[j].Date == formatDate(mondayLastWeek)) {
+                        dataLastWeek.push(total[j].total)
+                        break
+                    }                    
+                }
+                if (!dataLastWeek[i]) {
+                    dataLastWeek.push('0')
+                }
+            }
+            console.log(dataLastWeek)
+
 
             if (total) {
                 resolve({
