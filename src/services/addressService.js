@@ -89,7 +89,7 @@ let updateAddress = (userId, data) => {
                 }
             })
 
-            if (data.address_default) {
+            if (data.default) {
                 updateAddressDefault(userId, data.addressId)
             }
 
