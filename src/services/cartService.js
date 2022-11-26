@@ -5,26 +5,30 @@ var sequelize = require('sequelize');
 let deleteProduct = (productId, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let cart = await db.Cart.findAll({
-        where: { user_id: userId },
-        include: {
-          model: db.SizeShoe,
-          where: { product_id: productId }
-        }
+      let cart = await db.Cart.findOne({
+        where: { id: productId }
       })
 
-      if (cart == '') {
+
+
+      if (!cart) {
         resolve({
           success: false,
           message: 'No products found!'
         })
       }
 
-      for (let i = 0; i < cart.length; i++) {
-        await db.Cart.destroy({
-          where: { id: cart[i].id }
-        });
+      if (cart.user_id != userId) {
+        resolve({
+          success: false,
+          message: 'You do not have access!'
+        })
       }
+
+      await db.Cart.destroy({
+        where: { id: cart.id }
+      });
+
 
       resolve({
         success: true,
