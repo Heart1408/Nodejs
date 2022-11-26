@@ -1,4 +1,5 @@
 import db from '../models/index';
+import orderDetailService from '../services/orderDetailService'
 
 let getAllOrder = () => {
     return new Promise(async(resovle, reject) => {
@@ -146,6 +147,11 @@ let getOrderUser = (userId) => {
                 },
                 raw: true
             })
+
+            for (let i = 0; i < listOrder.length; i++) {
+                let listProduct = await orderDetailService.getDetailOrder(listOrder[i].id)
+                listOrder[i].listProducts = listProduct.listProduct
+            }
             if (listOrder) {
                 resolve({
                     success: true,
