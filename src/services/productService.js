@@ -260,31 +260,37 @@ let addProductToCart = (data, userId) => {
           })
         }
       } else {
-        let cart = await db.Cart.create({
-          user_id: userId,
-          sizeshoe_id: sizeshoe.id,
-          amount: 1,
-          status: 1,
-        })
+        if (data.amount <= sizeshoe.amount) {
+          let cart = await db.Cart.create({
+            user_id: userId,
+            sizeshoe_id: sizeshoe.id,
+            amount: data.amount
+          })
 
-        let product = await db.Product.findOne({
-          attributes: {
-            exclude: ['createdAt', 'updatedAt']
-          },
-          where: { id: data.productId },
-          raw: true,
-        });
-        let size = await db.Size.findOne({ where: { id: data.sizeId }, attributes: ['size'] });
-        product.category_id = category.id
-        product.brand_id = brand.id
-        product.sizeId = data.sizeId
-        product.size = size;
-        product.amount = cart.amount;
+          let product = await db.Product.findOne({
+            attributes: {
+              exclude: ['createdAt', 'updatedAt']
+            },
+            where: { id: data.productId },
+            raw: true,
+          });
+          let size = await db.Size.findOne({ where: { id: data.sizeId }, attributes: ['size'] });
+          product.category_id = category.id
+          product.brand_id = brand.id
+          product.sizeId = data.sizeId
+          product.size = size;
+          product.amount = cart.amount;
 
-        resolve({
-          success: true,
-          product_info: product,
-        })
+          resolve({
+            success: true,
+            product_info: product,
+          })
+        } else {
+          resolve({
+            success: false,
+            message: 'Số lượng sản phẩm quá vượt quá giới hạn ...'
+          })
+        }
       }
     } catch (e) {
       reject(e)
