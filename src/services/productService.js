@@ -77,6 +77,7 @@ let getRate = (productId, numberRate) => {
         where: { product_id: productId },
         include: {
           model: db.OrderDetail,
+          attributes: [],
           include: {
             model: db.Review,
             attributes: [],
@@ -134,9 +135,13 @@ let getInfoProduct = (productId) => {
           model: db.Order,
           attributes: ['id'],
           include: {
-            model: db.User,
-            attributes: ['username', 'avatar']
-          }
+            model: db.Address,
+            attributes: [],
+            include: {
+              model: db.User,
+              attributes: ['username', 'avatar']
+            }
+          }          
         }]
       })
 
@@ -145,8 +150,8 @@ let getInfoProduct = (productId) => {
         let data = {
           rate: comment[i].Review.rate,
           comment: comment[i].Review.comment,
-          username: comment[i].Order.User.username,
-          avatar: comment[i].Order.User.avatar
+          username: comment[i].Order.Address.User.username,
+          avatar: comment[i].Order.Address.User.avatar
         }
         datas.push(data);
       }
