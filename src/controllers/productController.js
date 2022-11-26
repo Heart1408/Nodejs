@@ -15,8 +15,7 @@ let getInfoProduct = async (req, res) => {
 
 let addProductToCart = async (req, res) => {
 
-  let { productId, sizeId, amount } = req.query
-
+  let { productId, sizeId, amount } = req.body
   if (!productId || !sizeId || !amount) {
     return res.status(500).json({
       success: false,
@@ -34,7 +33,7 @@ let addProductToCart = async (req, res) => {
   }
 
   let userId = req.userId;
-  let result = await productService.addProductToCart(req.query, userId);
+  let result = await productService.addProductToCart(req.body, userId);
 
   return res.status(200).json(result);
 }

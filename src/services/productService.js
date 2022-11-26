@@ -243,8 +243,8 @@ let addProductToCart = (data, userId) => {
             raw: true,
           })
           let size = await db.Size.findOne({ attributes: ['size'], where: { id: data.sizeId } })
-          productInfo.category_id = category.id
-          productInfo.brand_id = brand.id
+          productInfo.category_id = category ? category.id : null
+          productInfo.brand_id = brand ? brand.id : null
           productInfo.size = size.size
           productInfo.sizeId = data.sizeId
           productInfo.amount = cart.amount

@@ -21,7 +21,7 @@ const initAPIRoute = (app) => {
   route.post('/logout', verifyToken, userController.logout);
   route.post('/changePassword', verifyToken, userController.changePassword);
 
-  route.get('/product/addProductToCart', verifyToken, productController.addProductToCart);
+  route.post('/product/addProductToCart', verifyToken, productController.addProductToCart);
   route.delete('/cart/delete/:productId', verifyToken, cartController.deleteProduct);
   route.put('/cart/changeAmount', verifyToken, cartController.changeAmount);
   route.get('/cart/getListProduct', verifyToken, cartController.getListProduct);
