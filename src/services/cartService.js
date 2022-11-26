@@ -100,7 +100,7 @@ let getListProduct = (userId) => {
           attributes: ['id'],
           include: [{
             model: db.Size,
-            attributes: ['size'],
+            attributes: ['id','size'],
           }, {
             model: db.Product,
             attributes: ['image', 'name', 'price']
@@ -117,6 +117,7 @@ let getListProduct = (userId) => {
           id: cart[i].id,
           name: cart[i]['SizeShoe.Product.name'],
           image: cart[i]['SizeShoe.Product.image'],
+          size_id: cart[i]['SizeShoe.Size.id'],
           size: cart[i]['SizeShoe.Size.size'],
           price: cart[i]['SizeShoe.Product.price'],
           amount: cart[i].amount

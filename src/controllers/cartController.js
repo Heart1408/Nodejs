@@ -10,7 +10,7 @@ let deleteProduct = async (req, res) => {
 
 let changeAmount = async (req, res) => {
   let userId = req.userId;
-  let result = await cartService.changeAmount(req.query, userId);
+  let result = await cartService.changeAmount(req.body, userId);
 
   return res.status(200).json(result);
 }
