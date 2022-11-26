@@ -103,7 +103,7 @@ let getListProduct = (userId) => {
             attributes: ['id','size'],
           }, {
             model: db.Product,
-            attributes: ['image', 'name', 'price']
+            attributes: ['id' ,'image', 'name', 'price']
           }]
         },
         raw: true,
@@ -120,6 +120,7 @@ let getListProduct = (userId) => {
           size_id: cart[i]['SizeShoe.Size.id'],
           size: cart[i]['SizeShoe.Size.size'],
           price: cart[i]['SizeShoe.Product.price'],
+          product_id: cart[i]['SizeShoe.Product.id'],
           amount: cart[i].amount
         }
 
