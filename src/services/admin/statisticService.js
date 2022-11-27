@@ -93,6 +93,12 @@ let getSaleWeek = () => {
             data.newOrderCurrentDay = newOrder.newOrderCurrentDay
             data.newOrderRatio = newOrder.newOrderLastDay != 0 ? newOrder.newOrderCurrentDay * 100 / newOrder.newOrderLastDay : 100
 
+            data.ordersMonth = await orderMonth()
+
+            data.totalOrder = await totalOrder()
+            data.totalSale = await totalSale()
+            data.totalProduct = await totalProduct()
+
             if (total) {
                 resolve({
                     success: true,
@@ -152,6 +158,73 @@ let newOrderDay = async() => {
     today.setDate(today.getDate() - 1)
     let newOrderLastDay = await orderDay(formatDate(today))
     return {newOrderCurrentDay, newOrderLastDay}
+}
+
+let orderMonth = async() => {
+    let today = new Date()
+    let orders = await db.Order.findAll({
+        attributes: [
+            [sequelize.fn('MONTH', sequelize.col('ordertime')), 'Month'],
+            [sequelize.fn('COUNT', sequelize.col('ordertime')), 'orders']
+        ],
+        where : sequelize.where(sequelize.fn('YEAR', sequelize.col('ordertime')), '=', today.getFullYear()),
+        group: 'Month',
+        raw: true
+    })
+
+    let ordersMonth = []
+    for (let i = 0; i < 12; i++) {
+        let o = orders.find(element => element.Month == i)
+        if (o) {
+            orderMonth.push(parseInt(o.orders))
+        } else {
+            orderMonth.push(0)
+        }
+    }
+
+    return ordersMonth
+}
+
+let totalOrder = async() => {
+    let total = await db.Order.count()
+    return total
+}
+
+let totalProduct = async() => {
+    let total = await db.Product.count()
+    return total
+}
+
+let totalSale = async() => {
+    let total = await db.Order.findAll({
+        attributes: [
+            [sequelize.fn('SUM', sequelize.where(sequelize.col('OrderDetails->SizeShoe->Product.price'), '*' ,sequelize.col('OrderDetails.amount'))), 'total']
+        ],
+        include: [
+            {
+                model: db.OrderDetail,
+                required: true,
+                attributes: [],
+                include: [
+                    {
+                        model: db.SizeShoe,
+                        required: true,
+                        attributes: [],
+                        include: [
+                            {
+                                model: db.Product,
+                                required: true,
+                                attributes: []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        raw: true
+    })
+
+    return parseInt(total.total)
 }
 
 function padTo2Digits(num) {
