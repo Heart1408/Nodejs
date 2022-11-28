@@ -61,7 +61,7 @@ let createOrder = (products, address, userId) => {
             let detailData = []
 
             for (let i = 0; i < products.length; i++) {
-                let productSize = await getProductSizeId(products[i].id, products[i].size)
+                let productSize = await getProductSizeId(products[i].product_id, products[i].size_id)
                 let record = {
                     order_id: order.id,
                     product_size_id: productSize.id,

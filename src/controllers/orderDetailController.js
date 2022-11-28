@@ -45,7 +45,7 @@ let createOrder = async(req, res) => {
     }
 
     for (let i = 0; i < data.products.length; i++) {
-        let quantityInStock = await orderDetailService.getProductSizeId(data.products[i].id, data.products[i].size)
+        let quantityInStock = await orderDetailService.getProductSizeId(data.products[i].product_id, data.products[i].size_id)
         if (data.products[i].amount > quantityInStock.amount) {
             return res.status(500).json({
                 success: false,
