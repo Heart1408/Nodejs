@@ -24,7 +24,8 @@ let getListProduct = (data) => {
           where: {
             [Op.and]: [
               data.categoryId ? { 'category_id': data.categoryId } : null,
-              data.brandId ? { 'brand_id': data.brandId } : null
+              data.brandId ? { 'brand_id': data.brandId } : null,
+              data.collectionId ? { 'collection_id': data.collectionId } : null,
             ]
           },
           limit: 1
@@ -136,24 +137,21 @@ let getInfoProduct = (productId) => {
           attributes: ['id'],
           include: {
             model: db.Address,
-            attributes: [],
-            include: {
-              model: db.User,
-              attributes: ['username', 'avatar']
-            }
-          }          
+            attributes: ['id', 'user_id'],
+          }
         }]
       })
 
       let datas = []
       for (let i = 0; i < comment.length; i++) {
+        let user = await getUser(comment[i].Order.Address.user_id)
         let data = {
           rate: comment[i].Review.rate,
           comment: comment[i].Review.comment,
-          username: comment[i].Order.Address.User.username,
-          avatar: comment[i].Order.Address.User.avatar
+          username: user[0],
+          avatar: user[1]
         }
-        datas.push(data);
+        datas.push(data)
       }
 
       productInfo.size_info = size;
@@ -176,6 +174,23 @@ let getInfoProduct = (productId) => {
           message: 'abc',
         })
       }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+let getUser = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        attributes: ['username', 'avatar'],
+        where: { id: userId }
+      })
+
+      resolve([user.username,
+      user.avatar]
+      )
     } catch (e) {
       reject(e)
     }

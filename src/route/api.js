@@ -9,6 +9,7 @@ import profileController from '../controllers/profileController';
 import adminProductController from '../controllers/admin/ProductController';
 import collectionController from '../controllers/admin/collectionController';
 import statisticController from '../controllers/admin/statisticController';
+import reviewController from '../controllers/reviewController';
 
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
@@ -36,17 +37,21 @@ const initAPIRoute = (app) => {
   //route.get('/order/amountSoldProduct', orderDetailController.getAmountSoldProducts);
 
   route.get('/address', verifyRoles('user'), addressController.getAllAddress);
-  route.post('/address/add',verifyRoles('user'), addressController.addAddress);
+  route.post('/address/add', verifyRoles('user'), addressController.addAddress);
   route.post('/address/update', verifyRoles('user'), addressController.updateAddress);
   route.post('/address/delete', verifyRoles('user'), addressController.deleteAddress);
 
   route.get('/profile/:userId', verifyRoles('user', 'admin'), profileController.getProfile);
-  route.post('/profile/update', verifyRoles('admin', 'user'), fileUploader.single('file') , profileController.updateProfile);
+  route.post('/profile/update', verifyRoles('admin', 'user'), fileUploader.single('file'), profileController.updateProfile);
+
+  route.post('/review/create', verifyRoles('admin', 'user'), reviewController.create);
+  route.post('/review/edit', verifyRoles('admin', 'user'), reviewController.edit);
+  route.post('/review/delete', reviewController.delete);
 
   //admin
   route.put('/product/update/:productId', adminProductController.update);
   route.delete('/product/delete/:productId', adminProductController.deleteProduct);
-  route.post('/product/create', fileUploader.single('file') ,adminProductController.create);
+  route.get('/product/create', fileUploader.single('file'), adminProductController.create);
 
   route.get('/collection/getList', collectionController.getList);
   route.post('/collection/create', collectionController.create);
