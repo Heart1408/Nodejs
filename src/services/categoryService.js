@@ -22,6 +22,27 @@ let getListCategory = () => {
   })
 }
 
+let getListBrand = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let listBrand = await db.Brand.findAll({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        },
+        raw: true,
+      });
+
+      resolve({
+        success: true,
+        list: listBrand,
+      })
+    } catch (e) {
+      reject(e);
+    }
+  })
+}
+
 module.exports = {
   getListCategory: getListCategory,
+  getListBrand: getListBrand,
 }

@@ -14,6 +14,7 @@ router.get('/api/getListSize', productController.getListSize);
 
 router.get('/api/product/getRecommendedProduct', productController.getRecommendedProduct);
 router.get('/api/category/getList', categoryController.getList);
+router.get('/api/category/getListBrand', categoryController.getListBrand);
 
 router.post('/api/admin/login', adminController.handleLogin);
 
