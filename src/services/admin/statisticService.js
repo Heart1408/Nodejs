@@ -76,28 +76,31 @@ let getSaleWeek = () => {
             }
 
             let data = {}
-            data.total = total
-            data.lastWeek = dataLastWeek
-            data.currentWeek = dataCurrentWeek
-            data.currentDay = dataCurrentWeek[todayDay]
+            
+            data.currentDay = dataCurrentWeek[todayDay] //Doanh thu trong ngày
             let yesterday = todayDay == 0 ? dataLastWeek[6] : dataCurrentWeek[todayDay - 1]
-            data.currentDayRatio = yesterday != 0 ? dataCurrentWeek[todayDay] * 100 / yesterday : 100 
+            data.currentDayRatio = yesterday != 0 ? dataCurrentWeek[todayDay] * 100 / yesterday : 100 //Phần trăm tăng doanh thu trong ngày so với hôm trước
+
+            data.totalUser = await totalUser() //Tổng user
 
             let newUser = await newUserMonth()
-            data.newUserCurrentMonth = newUser.newUserCurrentMonth
-            data.newUserRatio = newUser.newUserLastMonth != 0 ? newUser.newUserCurrentMonth * 100 / newUser.newUserLastMonth : 100
+            data.newUserCurrentMonth = newUser.newUserCurrentMonth //User mới trong tháng
+            data.newUserRatio = newUser.newUserLastMonth != 0 ? newUser.newUserCurrentMonth * 100 / newUser.newUserLastMonth : 100 //Phần trăm tăng số user mới so với tháng trước
 
-            data.totalUser = await totalUser()
+            
 
             let newOrder = await newOrderDay()
-            data.newOrderCurrentDay = newOrder.newOrderCurrentDay
-            data.newOrderRatio = newOrder.newOrderLastDay != 0 ? newOrder.newOrderCurrentDay * 100 / newOrder.newOrderLastDay : 100
+            data.newOrderCurrentDay = newOrder.newOrderCurrentDay //Đơn hàng mới trong ngày
+            data.newOrderRatio = newOrder.newOrderLastDay != 0 ? newOrder.newOrderCurrentDay * 100 / newOrder.newOrderLastDay : 100 //Phần trăm tăng số đơn hàng mới só với hôm trước
 
-            data.ordersMonth = await orderMonth()
+            data.ordersMonth = await orderMonth() //Đơn hàng theo từng tháng trong năm
 
-            data.totalOrder = await totalOrder()
-            data.totalSale = await totalSale()
-            data.totalProduct = await totalProduct()
+            data.lastWeek = dataLastWeek //Doanh thu tuần trước
+            data.currentWeek = dataCurrentWeek //Doanh thu tuần này
+
+            data.totalOrder = await totalOrder() //Tổng đơn hàng
+            data.totalSale = await totalSale() //Tổng doanh thu
+            data.totalProduct = await totalProduct() //Tổng sản phẩm
 
             if (total) {
                 resolve({
@@ -174,11 +177,11 @@ let orderMonth = async() => {
 
     let ordersMonth = []
     for (let i = 0; i < 12; i++) {
-        let o = orders.find(element => element.Month == i)
+        let o = orders.find(element => element.Month == i + 1)
         if (o) {
-            orderMonth.push(parseInt(o.orders))
+            ordersMonth.push(parseInt(o.orders))
         } else {
-            orderMonth.push(0)
+            ordersMonth.push(0)
         }
     }
 
@@ -221,10 +224,14 @@ let totalSale = async() => {
                 ]
             }
         ],
+        where : {
+            delivery: {
+                [Op.not]: null
+            }
+        },
         raw: true
     })
-
-    return parseInt(total.total)
+    return parseInt(total[0].total)
 }
 
 function padTo2Digits(num) {
