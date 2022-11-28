@@ -24,7 +24,8 @@ let getListProduct = (data) => {
           where: {
             [Op.and]: [
               data.categoryId ? { 'category_id': data.categoryId } : null,
-              data.brandId ? { 'brand_id': data.brandId } : null
+              data.brandId ? { 'brand_id': data.brandId } : null,
+              data.collectionId ? { 'collection_id': data.collectionId } : null,
             ]
           },
           limit: 1
