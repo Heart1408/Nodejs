@@ -8,6 +8,7 @@ import addressController from '../controllers/addressController';
 import profileController from '../controllers/profileController';
 import adminProductController from '../controllers/admin/ProductController';
 import collectionController from '../controllers/admin/collectionController';
+import statisticController from '../controllers/admin/statisticController';
 
 import verifyToken from '../middleware/auth';
 import verifyRoles from '../middleware/verifyRoles';
@@ -54,6 +55,8 @@ const initAPIRoute = (app) => {
   route.get('/collection/getProduct/:collectionId', collectionController.getProduct);
   route.post('/collection/deleteProduct', collectionController.deleteProduct);
   route.post('/collection/addProduct', collectionController.addProduct);
+
+  route.get('/dashboard/sale', statisticController.getSale);
 
   return app.use('/api', route);
 }
