@@ -54,7 +54,7 @@ let createOrder = async(req, res) => {
             })
         }
     }
-    let success = await orderDetailService.createOrder(data.products, data.address)
+    let success = await orderDetailService.createOrder(data.products, data.address, req.userId)
 
     return res.status(200).json(success);
 }

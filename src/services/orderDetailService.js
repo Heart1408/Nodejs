@@ -49,7 +49,7 @@ let getDetailOrder = (orderId) => {
     })
 }
 
-let createOrder = (products, address) => {
+let createOrder = (products, address, userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let order = await db.Order.create({
@@ -74,6 +74,20 @@ let createOrder = (products, address) => {
                         id: productSize.id
                     }
                 })
+                let cart = await db.Cart.findOne({
+                    where: {
+                        user_id: userId,
+                        sizeshoe_id: productSize.id
+                    },
+                    raw: true
+                })
+                if (cart) {
+                    await db.Cart.destroy({
+                        where: {
+                            id: cart.id
+                        }
+                    })
+                }
                 detailData.push(record);                
             }
             
