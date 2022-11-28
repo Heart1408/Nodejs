@@ -170,7 +170,6 @@ let deleteReview = (userId, productId) => {
           }
         })
 
-
         orderDetail.review_id = null
         await orderDetail.save()
 
