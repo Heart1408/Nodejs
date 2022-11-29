@@ -5,7 +5,7 @@ let getDetailOrder = (orderId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let listProduct = await db.OrderDetail.findAll({
-                attributes: ['id', 'amount', 'SizeShoe.product_id', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
+                attributes: ['id', 'amount', [sequelize.col('SizeShoe->Size.id'), 'size_id'], 'SizeShoe.product_id', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
                 include: [
                     {
                         model: db.SizeShoe,
@@ -88,9 +88,9 @@ let createOrder = (products, address, userId) => {
                         }
                     })
                 }
-                detailData.push(record);                
+                detailData.push(record);
             }
-            
+
             db.OrderDetail.bulkCreate(detailData)
 
             if (order) {
@@ -109,7 +109,7 @@ let createOrder = (products, address, userId) => {
     })
 }
 
-let getProductSizeId = async(productId, sizeId) => {
+let getProductSizeId = async (productId, sizeId) => {
     let id = await db.SizeShoe.findOne({
         where: {
             product_id: productId,
