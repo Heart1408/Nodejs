@@ -14,34 +14,11 @@ let getListProduct = (data) => {
     try {
       const offset = data.pageNumber ? getPagination(data.pageNumber) : 0;
 
-      const { count, rows } = await db.Product.findAndCountAll({
-        attributes: {
-          exclude: ['createdAt', 'updatedAt'],
-        },
+      const { count, rows } = await db.Product.scope('defaultScope', { method: ['filter', data.keyword, data.maxPrice, data.minPrice, data.sortByPrice, data.collectionId] }).findAndCountAll({
         include: {
-          model: db.Product_Category,
-          attributes: [],
-          where: {
-            [Op.and]: [
-              data.categoryId ? { 'category_id': data.categoryId } : null,
-              data.brandId ? { 'brand_id': data.brandId } : null,
-              data.collectionId ? { 'collection_id': data.collectionId } : null,
-            ]
-          },
-          limit: 1
+          model: db.Product_Category.scope({ method: ['filterProduct', data.categoryId, data.brandId] }),
+          attributes: []
         },
-        where: {
-          [Op.and]: [
-            data.keyword ? {
-              name: {
-                [Op.like]: '%' + data.keyword + '%',
-              }
-            } : null,
-            data.minPrice ? { price: { [Op.gte]: data.minPrice } } : null,
-            data.maxPrice ? { price: { [Op.lte]: data.maxPrice } } : null,
-          ]
-        },
-        order: data.sortByPrice ? [['price', data.sortByPrice]] : null,
         limit,
         offset,
         raw: true,
@@ -324,14 +301,8 @@ let getRecommendedProduct = (categoryId, brandId, pageNumber) => {
           exclude: ['createdAt', 'updatedAt']
         },
         include: [{
-          model: db.Product_Category,
-          attributes: ['category_id', 'brand_id'],
-          where: {
-            [Op.and]: [
-              categoryId ? { category_id: categoryId } : null,
-              brandId ? { brand_id: brandId } : null
-            ]
-          }
+          model: db.Product_Category.scope({ method: ['filterProduct', categoryId, brandId] }),
+          attributes: ['category_id', 'brand_id']
         },
           // {
           //   model: db.SizeShoe,
