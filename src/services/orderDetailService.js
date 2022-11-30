@@ -1,5 +1,6 @@
 import { ModulesOption } from '@babel/preset-env/lib/options';
 import db, { sequelize } from '../models/index'
+import reviewService from '../services/reviewService'
 
 let getDetailOrder = (orderId) => {
     return new Promise(async (resolve, reject) => {
@@ -32,6 +33,25 @@ let getDetailOrder = (orderId) => {
                 raw: true
             })
 
+            let order = await db.Order.findOne({
+                attributes: ['id', 'Address.user_id'],
+                include: [
+                    {
+                        model: db.Address, 
+                        required: true,
+                        attributes: []
+                    }
+
+                ],
+                where : {
+                    id: orderId
+                },
+                raw: true
+            })
+            for(let i = 0; i < listProduct.length; i++) {
+                let review = await reviewService.getStatus(order.user_id, listProduct[i].product_id)
+                listProduct[i].reviewStatus = review.status
+            }
             if (listProduct) {
                 resolve({
                     success: true,
