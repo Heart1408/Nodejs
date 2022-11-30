@@ -46,7 +46,8 @@ const initAPIRoute = (app) => {
 
   route.post('/review/create', verifyRoles('admin', 'user'), reviewController.create);
   route.post('/review/edit', verifyRoles('admin', 'user'), reviewController.edit);
-  route.post('/review/delete', reviewController.delete);
+  route.post('/review/delete', verifyRoles('admin', 'user'), reviewController.delete);
+  route.post('/review/getStatus', verifyRoles('admin', 'user'), reviewController.getStatus);
 
   //admin
   route.put('/product/update/:productId', adminProductController.update);

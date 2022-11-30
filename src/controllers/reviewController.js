@@ -38,9 +38,18 @@ let deleteReview = async (req, res) => {
   return res.status(200).json(result);
 }
 
+let getStatus = async (req, res) => {
+  let userId = req.userId;
+  let productId = req.body.productId
+  let result = await reviewService.getStatus(userId, productId);
+
+  return res.status(200).json(result);
+}
+
 module.exports = {
   getList: getList,
   create: create,
   edit: edit,
   delete: deleteReview,
+  getStatus: getStatus
 }
