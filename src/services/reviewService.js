@@ -184,9 +184,50 @@ let deleteReview = (userId, productId) => {
   })
 }
 
+let getStatus = (userId, productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let status = 0, message = ''
+      let orderDetail = await db.OrderDetail.findOne({
+        attributes: ['id', 'review_id'],
+        include: [{
+          model: db.SizeShoe,
+          where: { product_id: productId }
+        }, {
+          model: db.Order,
+          where: { status: 4 },
+          include: {
+            model: db.Address,
+            where: { user_id: userId }
+          }
+        }]
+      })
+
+      if (!orderDetail) {
+        message = 'Chưa thể đánh giá sản phẩm!'
+      } else if (orderDetail.review_id != null) {
+        status = 1
+        message = 'Đã đánh giá sản phẩm!'
+
+      } else {
+        status = 2
+        message = 'Chưa đánh giá sảm phẩm!'
+      }
+
+      resolve({
+        status: status,
+        message: message
+      })
+    } catch (e) {
+      reject(e);
+    }
+  })
+}
+
 module.exports = {
   getList: getList,
   create: create,
   edit: edit,
-  deleteReview: deleteReview
+  deleteReview: deleteReview,
+  getStatus: getStatus
 }

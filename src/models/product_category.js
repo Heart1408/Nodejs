@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 'use strict';
 const {
   Model
@@ -21,6 +22,18 @@ module.exports = (sequelize, DataTypes) => {
     category_id: DataTypes.INTEGER,
     brand_id: DataTypes.INTEGER
   }, {
+    scopes: {
+      filterProduct(categoryId, brandId) {
+        return {
+          where: {
+            [Op.and]: [
+              categoryId ? { 'category_id': categoryId } : null,
+              brandId ? { 'brand_id': brandId } : null
+            ]
+          }
+        }
+      }
+    },
     sequelize,
     modelName: 'Product_Category',
   });
