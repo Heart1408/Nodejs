@@ -1,11 +1,12 @@
 import { ModulesOption } from '@babel/preset-env/lib/options';
 import db, { sequelize } from '../models/index'
+import reviewService from '../services/reviewService'
 
 let getDetailOrder = (orderId) => {
     return new Promise(async (resolve, reject) => {
         try {
             let listProduct = await db.OrderDetail.findAll({
-                attributes: ['id', 'amount', 'SizeShoe.product_id', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
+                attributes: ['id', 'amount', [sequelize.col('SizeShoe->Size.id'), 'size_id'], 'SizeShoe.product_id', 'SizeShoe->Product.name', 'SizeShoe->Product.description', 'SizeShoe->Product.image', 'SizeShoe->Product.price', 'SizeShoe->Size.size'],
                 include: [
                     {
                         model: db.SizeShoe,
@@ -32,6 +33,25 @@ let getDetailOrder = (orderId) => {
                 raw: true
             })
 
+            let order = await db.Order.findOne({
+                attributes: ['id', 'Address.user_id'],
+                include: [
+                    {
+                        model: db.Address, 
+                        required: true,
+                        attributes: []
+                    }
+
+                ],
+                where : {
+                    id: orderId
+                },
+                raw: true
+            })
+            for(let i = 0; i < listProduct.length; i++) {
+                let review = await reviewService.getStatus(order.user_id, listProduct[i].product_id)
+                listProduct[i].reviewStatus = review.status
+            }
             if (listProduct) {
                 resolve({
                     success: true,
@@ -88,9 +108,9 @@ let createOrder = (products, address, userId) => {
                         }
                     })
                 }
-                detailData.push(record);                
+                detailData.push(record);
             }
-            
+
             db.OrderDetail.bulkCreate(detailData)
 
             if (order) {
@@ -109,7 +129,7 @@ let createOrder = (products, address, userId) => {
     })
 }
 
-let getProductSizeId = async(productId, sizeId) => {
+let getProductSizeId = async (productId, sizeId) => {
     let id = await db.SizeShoe.findOne({
         where: {
             product_id: productId,
