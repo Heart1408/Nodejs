@@ -20,12 +20,12 @@ let createProduct = (data, image) => {
 
       let productSize = []; 
       if (data.sizes) {
-        let arr_size = JSON.parse(data.sizes)
-        for (let i = 0; i < arr_size.length; i++) {
+        // let arr_size = JSON.parse(data.sizes)
+        for (let i = 0; i < data.sizes.length; i++) {
           let record = {
             product_id: newProduct.id,
-            size_id: arr_size[i].size_id,
-            amount: arr_size[i].amount
+            size_id: data.sizes[i].size_id,
+            amount: data.sizes[i].amount
           }
           productSize.push(record);
         }
@@ -77,10 +77,11 @@ let updateProduct = (productId, data) => {
       }
 
       if (data.sizes) {
-        let arr_size = JSON.parse(data.sizes)
-        for (let i = 0; i < arr_size.length; i++) {
-          let size_id = arr_size[i].size_id;
-          let amount = arr_size[i].amount;
+        // let arr_size = JSON.parse(data.sizes)
+        // console.log(arr_size)
+        for (let i = 0; i < data.sizes.length; i++) {
+          let size_id = data.sizes[i].size_id;
+          let amount = data.sizes[i].amount;
           let sizeShoe = await db.SizeShoe.findOne({ where: { size_id: size_id, product_id: product.id } });
 
           if (sizeShoe) {

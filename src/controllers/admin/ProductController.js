@@ -9,6 +9,7 @@ let create = async (req, res) => {
       message: 'Missing inputs parameter!',
     })
   }
+
   let result = await productService.createProduct(req.body, req.file.path);
 
   return res.status(200).json(result);
@@ -16,6 +17,7 @@ let create = async (req, res) => {
 
 let update = async (req, res) => {
   let productId = req.params.productId;
+  console.log(req.body);
   let result = await productService.updateProduct(productId, req.body);
 
   return res.status(200).json(result);
