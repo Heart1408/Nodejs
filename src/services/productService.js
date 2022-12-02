@@ -83,6 +83,10 @@ let getInfoProduct = (productId) => {
         attributes: {
           exclude: ['createdAt', 'updatedAt']
         },
+        include: {
+          model: db.Product_Category,
+          attributes: ['category_id', 'brand_id']
+        },
         raw: true,
       })
 
@@ -96,8 +100,7 @@ let getInfoProduct = (productId) => {
           attributes: [],
           where: { product_id: productInfo.id },
         }],
-        group: ['Size.id'],
-        raw: true,
+        group: ['Size.id']
       })
 
       let comment = await db.OrderDetail.findAll({
