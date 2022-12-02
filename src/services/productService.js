@@ -93,7 +93,7 @@ let getInfoProduct = (productId) => {
       let size = await db.Size.findAll({
         attributes: [
           'id', 'size',
-          [sequelize.fn('SUM', sequelize.col('sizeshoes.amount')), 'amount']
+          [sequelize.fn('SUM', sequelize.col('SizeShoes.amount')), 'amount']
         ],
         include: [{
           model: db.SizeShoe,
@@ -111,6 +111,7 @@ let getInfoProduct = (productId) => {
           attributes: []
         }, {
           model: db.Review,
+          required: true,
           attributes: ['rate', 'comment']
         }, {
           model: db.Order,
