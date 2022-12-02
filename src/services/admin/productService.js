@@ -60,11 +60,6 @@ let updateProduct = (productId, data) => {
 
       if (data.categoryId) {
         let productCategory = await db.Product_Category.findOne({
-          include: {
-            model: db.Category,
-            attributes: [],
-            where: { 'type': 1 },
-          },
           where: { product_id: product.id },
         });
 
