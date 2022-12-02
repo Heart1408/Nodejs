@@ -1,6 +1,7 @@
 import productService from '../../services/admin/productService';
 
 let create = async (req, res) => {
+  console.log(req.body)
   let { name, price, description, categoryId } = req.body
   if (!name || !price || !req.file || !description || !categoryId) {
     return res.status(500).json({
