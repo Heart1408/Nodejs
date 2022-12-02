@@ -20,6 +20,7 @@ let createProduct = (data, image) => {
 
       let productSize = []; 
       if (data.sizes) {
+        // let arr_size = JSON.parse(data.sizes)
         for (let i = 0; i < data.sizes.length; i++) {
           let record = {
             product_id: newProduct.id,
@@ -60,11 +61,6 @@ let updateProduct = (productId, data) => {
 
       if (data.categoryId) {
         let productCategory = await db.Product_Category.findOne({
-          include: {
-            model: db.Category,
-            attributes: [],
-            where: { 'type': 1 },
-          },
           where: { product_id: product.id },
         });
 
@@ -81,6 +77,8 @@ let updateProduct = (productId, data) => {
       }
 
       if (data.sizes) {
+        // let arr_size = JSON.parse(data.sizes)
+        // console.log(arr_size)
         for (let i = 0; i < data.sizes.length; i++) {
           let size_id = data.sizes[i].size_id;
           let amount = data.sizes[i].amount;
