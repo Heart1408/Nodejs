@@ -51,8 +51,8 @@ const initAPIRoute = (app) => {
 
   //admin
   route.put('/product/update/:productId', adminProductController.update);
-  route.delete('/product/delete/:productId', verifyRoles('admin'), adminProductController.deleteProduct);
-  route.post('/product/create', verifyRoles('admin'), adminProductController.create);
+  route.delete('/product/delete/:productId', adminProductController.deleteProduct);
+  route.post('/product/create', fileUploader.single('file'), adminProductController.create);
 
   route.get('/collection/getList', collectionController.getList);
   route.post('/collection/create', collectionController.create);
