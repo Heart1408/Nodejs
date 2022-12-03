@@ -2,10 +2,19 @@ import db from '../models/index';
 import orderDetailService from '../services/orderDetailService'
 import reviewService from '../services/reviewService'
 
-let getAllOrder = () => {
+const limit = 12
+
+let getPagination = (pageNumber) => {
+    const offset = (pageNumber - 1) * limit;
+    return offset;
+}
+
+let getAllOrder = (data) => {
     return new Promise(async(resovle, reject) => {
         try {
-            let listOrder = await db.Order.findAll({
+            let offset = data.pageNumber ? getPagination(data.pageNumber) : 0
+
+            let { count, rows} = await db.Order.findAndCountAll({
                 attributes: ['id', 'Address->User.username', 'Address.phone', 'Address.address', 'Address.receiver_name', 'status', 'ordertime', 'delivery'],
                 include: [
                     {
@@ -21,16 +30,21 @@ let getAllOrder = () => {
                         ]
                     }
                 ],
+                where: 
+                    data.orderStatus ? { status : data.orderStatus} : null
+                ,
+                offset,
+                limit,
                 order: [
-                    ['ordertime', 'DESC']
+                    data.sortByTime ? ['ordertime', data.sortByTime] : ['ordertime', 'DESC']
                 ],
                 raw: true
             });
 
-            if (listOrder) {
+            if (rows) {
                 resovle({
                     success: true,
-                    listAllOrder: listOrder
+                    listAllOrder: rows
                 })
             }
             else {

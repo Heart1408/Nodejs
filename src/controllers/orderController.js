@@ -1,7 +1,7 @@
 import orderService from '../services/orderService'
 
 let getAllOrder = async (req, res) => {
-    let listAllOrder = await orderService.getAllOrder();
+    let listAllOrder = await orderService.getAllOrder(req.query);
 
     return res.status(200).json(listAllOrder);
 }
